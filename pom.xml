@@ -594,6 +594,7 @@
   </properties>
 
   <modules>
+    <module>netty-example</module>
     <module>all</module>
     <module>dev-tools</module>
     <module>common</module>
