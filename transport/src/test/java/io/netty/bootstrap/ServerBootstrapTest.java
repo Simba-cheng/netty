@@ -47,12 +47,15 @@ public class ServerBootstrapTest {
     @Test
     @Timeout(value = 5000, unit = TimeUnit.MILLISECONDS)
     public void testHandlerRegister() throws Exception {
+        final AttributeKey<String> key = AttributeKey.valueOf(UUID.randomUUID().toString());
         final CountDownLatch latch = new CountDownLatch(1);
         final AtomicReference<Throwable> error = new AtomicReference<Throwable>();
         LocalEventLoopGroup group = new LocalEventLoopGroup(1);
         try {
             ServerBootstrap sb = new ServerBootstrap();
             sb.channel(LocalServerChannel.class)
+              .option(ChannelOption.SO_BACKLOG, 128)
+              .attr(key, "value")
               .group(group)
               .childHandler(new ChannelInboundHandlerAdapter())
               .handler(new ChannelHandlerAdapter() {
