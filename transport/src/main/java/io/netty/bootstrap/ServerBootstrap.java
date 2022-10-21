@@ -72,8 +72,12 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
     @Override
     public ServerBootstrap group(EventLoopGroup group) {
         /*
-            如果只使用一个线程池，'主从Reactor模式'退化为'单Reactor模式'
-            即 parentGroup 和 childGroup 是同一个线程池
+            如果只使用一个线程池，即 parentGroup 和 childGroup 是同一个线程池,
+            '主从reactor-多线程模型' 退化为-> '单reactor-单线程模型' or '单reactor-多线程模型'
+
+
+
+
          */
         return group(group, group);
     }
