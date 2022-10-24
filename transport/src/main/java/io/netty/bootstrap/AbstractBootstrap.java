@@ -231,11 +231,16 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
      * Create a new {@link Channel} and bind it.
      */
     public ChannelFuture bind() {
+        // 检查、校验
         validate();
+
+        // 重要配置不存在,快速中断
         SocketAddress localAddress = this.localAddress;
         if (localAddress == null) {
             throw new IllegalStateException("localAddress not set");
         }
+
+        // 绑定
         return doBind(localAddress);
     }
 
@@ -269,6 +274,8 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     }
 
     private ChannelFuture doBind(final SocketAddress localAddress) {
+
+        // 创建、初始化、注册 channel
         final ChannelFuture regFuture = initAndRegister();
         final Channel channel = regFuture.channel();
         if (regFuture.cause() != null) {
@@ -276,13 +283,19 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
         }
 
         if (regFuture.isDone()) {
+            // 注册完成并且成功
             // At this point we know that the registration was complete and successful.
+
             ChannelPromise promise = channel.newPromise();
+
+            // 绑定端口
             doBind0(regFuture, channel, localAddress, promise);
             return promise;
         } else {
+            // 此时注册还没有完成,但总是会完成的
             // Registration future is almost always fulfilled already, but just in case it's not.
             final PendingRegistrationPromise promise = new PendingRegistrationPromise(channel);
+            // 添加回调监听器
             regFuture.addListener(new ChannelFutureListener() {
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
@@ -295,7 +308,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
                         // Registration was successful, so set the correct executor to use.
                         // See https://github.com/netty/netty/issues/2586
                         promise.registered();
-
+                        // 绑定端口
                         doBind0(regFuture, channel, localAddress, promise);
                     }
                 }
@@ -307,7 +320,9 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     final ChannelFuture initAndRegister() {
         Channel channel = null;
         try {
+            // 创建 channel,对于 ServerBootstrap 来说,一半是NioServerSocketChannel
             channel = channelFactory.newChannel();
+            // 初始化 channel
             init(channel);
         } catch (Throwable t) {
             if (channel != null) {
@@ -320,6 +335,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
             return new DefaultChannelPromise(new FailedChannel(), GlobalEventExecutor.INSTANCE).setFailure(t);
         }
 
+        // 注册 channel 到 selector（每个 NioEventLoop 内部都有一个 java.nio.channels.Selector）
         ChannelFuture regFuture = config().group().register(channel);
         if (regFuture.cause() != null) {
             if (channel.isRegistered()) {

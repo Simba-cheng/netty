@@ -75,9 +75,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
             如果只使用一个线程池，即 parentGroup 和 childGroup 是同一个线程池,
             '主从reactor-多线程模型' 退化为-> '单reactor-单线程模型' or '单reactor-多线程模型'
 
-
-
-
+            具体是 '单reactor-单线程模型' 还是 '单reactor-多线程模型'，要看构造EventLoopGroup时的配置。
          */
         return group(group, group);
     }
