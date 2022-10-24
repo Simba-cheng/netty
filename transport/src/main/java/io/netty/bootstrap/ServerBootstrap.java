@@ -135,7 +135,9 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
 
     @Override
     void init(Channel channel) {
+        // 为 ServerSocketChannel 配置TCP等参数
         setChannelOptions(channel, newOptionsArray(), logger);
+        // 为 ServerSocketChannel 配置自定义属性
         setAttributes(channel, newAttributesArray());
 
         ChannelPipeline p = channel.pipeline();
@@ -145,10 +147,15 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         final Entry<ChannelOption<?>, Object>[] currentChildOptions = newOptionsArray(childOptions);
         final Entry<AttributeKey<?>, Object>[] currentChildAttrs = newAttributesArray(childAttrs);
 
+        // 装配 pipeline 流水线
         p.addLast(new ChannelInitializer<Channel>() {
             @Override
             public void initChannel(final Channel ch) {
+
+                // 注意：这里的 ch 就是上面的ServerSocketChannel
                 final ChannelPipeline pipeline = ch.pipeline();
+
+                // 这个Handler就是我们通过ServerBootstrap.handler(XXX)装配的
                 ChannelHandler handler = config.handler();
                 if (handler != null) {
                     pipeline.addLast(handler);

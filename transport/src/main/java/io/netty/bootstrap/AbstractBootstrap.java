@@ -320,7 +320,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     final ChannelFuture initAndRegister() {
         Channel channel = null;
         try {
-            // 创建 channel,对于 ServerBootstrap 来说,一半是NioServerSocketChannel
+            // 创建 channel,对于 ServerBootstrap 来说,一般是 NioServerSocketChannel
             channel = channelFactory.newChannel();
             // 初始化 channel
             init(channel);
@@ -336,6 +336,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
         }
 
         // 注册 channel 到 selector（每个 NioEventLoop 内部都有一个 java.nio.channels.Selector）
+        // EventLoopGroup 中的每一个 EventLoop 对象内部都封装了 java.nio.channels.Selector。
         ChannelFuture regFuture = config().group().register(channel);
         if (regFuture.cause() != null) {
             if (channel.isRegistered()) {
