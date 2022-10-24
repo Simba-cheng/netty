@@ -63,10 +63,14 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
     /**
      * Create a new instance.
      *
-     * @param nThreads          the number of threads that will be used by this instance.
-     * @param executor          the Executor to use, or {@code null} if the default should be used.
-     * @param chooserFactory    the {@link EventExecutorChooserFactory} to use.
-     * @param args              arguments which will passed to each {@link #newChild(Executor, Object...)} call
+     * @param nThreads       the number of threads that will be used by this instance.
+     *                       内部 NioEventLoop 数量,不指定则为CPU核数的2倍
+     * @param executor       the Executor to use, or {@code null} if the default should be used.
+     *                       JUC中的任务执行器(线程池),默认为null,每一个 EventLoop 内部都会包含一个 executor
+     * @param chooserFactory the {@link EventExecutorChooserFactory} to use.
+     *                       用于创建 Chooser 对象的工厂类
+     *                       Chooser可以看成一个负载均衡器,用于从 NioEventLoopGroup 中选择一个 EventLoop
+     * @param args           arguments which will passed to each {@link #newChild(Executor, Object...)} call
      */
     protected MultithreadEventExecutorGroup(int nThreads, Executor executor,
                                             EventExecutorChooserFactory chooserFactory, Object... args) {
