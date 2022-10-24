@@ -158,12 +158,15 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
                 // 这个Handler就是我们通过ServerBootstrap.handler(XXX)装配的
                 ChannelHandler handler = config.handler();
                 if (handler != null) {
+                    // 将自定义的Handler添加到Pipeline中
                     pipeline.addLast(handler);
                 }
 
+                // 向 ServerSocketChannel(父Channel)所属的 EventLoop 中提交一个异步任务
                 ch.eventLoop().execute(new Runnable() {
                     @Override
                     public void run() {
+                        // ServerBootstrapAcceptor 用于将建立连接的 SocketChannel 转发给 子Reactor线程池
                         pipeline.addLast(new ServerBootstrapAcceptor(
                                 ch, currentChildGroup, currentChildHandler, currentChildOptions, currentChildAttrs));
                     }
