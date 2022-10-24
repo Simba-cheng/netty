@@ -76,15 +76,18 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
                                             EventExecutorChooserFactory chooserFactory, Object... args) {
         checkPositive(nThreads, "nThreads");
 
+        // 没有指定线程池,则创建默认.
         if (executor == null) {
             executor = new ThreadPerTaskExecutor(newDefaultThreadFactory());
         }
 
+        // 创建内部的 EventLoop 数组，nThreads默认为CPU核数*2
         children = new EventExecutor[nThreads];
 
         for (int i = 0; i < nThreads; i ++) {
             boolean success = false;
             try {
+                // 创建 EventLoop 对象
                 children[i] = newChild(executor, args);
                 success = true;
             } catch (Exception e) {
@@ -112,6 +115,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
             }
         }
 
+        // Chooser 本质可以看成一个负载均衡器，用于选择一个内部的 EventLoop，默认采用round-robin算法
         chooser = chooserFactory.newChooser(children);
 
         final FutureListener<Object> terminationListener = new FutureListener<Object>() {
