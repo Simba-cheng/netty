@@ -56,6 +56,10 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     @SuppressWarnings("unchecked")
     private static final Map.Entry<AttributeKey<?>, Object>[] EMPTY_ATTRIBUTE_ARRAY = new Map.Entry[0];
 
+    /**
+     * 这里保存的是 parentGroup
+     * 即:用于监听客户端连接,专门负责与客户端创建连接
+     */
     volatile EventLoopGroup group;
     @SuppressWarnings("deprecation")
     private volatile ChannelFactory<? extends C> channelFactory;
@@ -394,6 +398,10 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     }
 
     /**
+     * 返回已配置的 {@link EventLoopGroup},如果未配置则返回null。
+     * <p>
+     * 这里返回的 {@link EventLoopGroup},是 parentGroup,即:用于监听客户端连接,专门负责与客户端创建连接
+     * <p>
      * Returns the configured {@link EventLoopGroup} or {@code null} if non is configured yet.
      *
      * @deprecated Use {@link #config()} instead.
