@@ -326,8 +326,10 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
         try {
             // 创建 channel,对于 ServerBootstrap 来说,一般是 NioServerSocketChannel
             channel = channelFactory.newChannel();
-            // 初始化 channel
+
+            // MARK 初始化 channel
             init(channel);
+
         } catch (Throwable t) {
             if (channel != null) {
                 // channel can be null if newChannel crashed (eg SocketException("too many open files"))

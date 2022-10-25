@@ -54,7 +54,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
 
     /**
      * 这里保存的是 childGroup
-     * 即: 用于处理每一个连接发生的I/O读写事件
+     * 即: 用于处理每一个已建立连接发生的I/O读写事件
      */
     private volatile EventLoopGroup childGroup;
     private volatile ChannelHandler childHandler;
@@ -89,6 +89,9 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
      * Set the {@link EventLoopGroup} for the parent (acceptor) and the child (client). These
      * {@link EventLoopGroup}'s are used to handle all the events and IO for {@link ServerChannel} and
      * {@link Channel}'s.
+     *
+     * @param parentGroup 用于监听客户端连接,专门负责与客户端创建连接
+     * @param childGroup  用于处理每一个已建立连接发生的I/O读写事件
      */
     public ServerBootstrap group(EventLoopGroup parentGroup, EventLoopGroup childGroup) {
         super.group(parentGroup);
@@ -147,6 +150,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
 
         ChannelPipeline p = channel.pipeline();
 
+        // MARK 获取 childGroup,即: 用于处理每一个已建立连接发生的I/O读写事件
         final EventLoopGroup currentChildGroup = childGroup;
         final ChannelHandler currentChildHandler = childHandler;
         final Entry<ChannelOption<?>, Object>[] currentChildOptions = newOptionsArray(childOptions);
@@ -171,7 +175,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
                 ch.eventLoop().execute(new Runnable() {
                     @Override
                     public void run() {
-                        // ServerBootstrapAcceptor 用于将建立连接的 SocketChannel 转发给 子Reactor线程池
+                        // MARK ServerBootstrapAcceptor 用于将建立连接的 SocketChannel 转发给 childGroup
                         pipeline.addLast(new ServerBootstrapAcceptor(
                                 ch, currentChildGroup, currentChildHandler, currentChildOptions, currentChildAttrs));
                     }
@@ -225,6 +229,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         @Override
         @SuppressWarnings("unchecked")
         public void channelRead(ChannelHandlerContext ctx, Object msg) {
+            // 此处的 msg,是已建立链接的 socketChannel,因此可以直接强转
             final Channel child = (Channel) msg;
 
             child.pipeline().addLast(childHandler);
@@ -233,6 +238,13 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
             setAttributes(child, childAttrs);
 
             try {
+                /*
+                    将已建立链接的 socketChannel 注册到 childGroup
+
+                    childGroup 是如何从内部取出一个 child，与已建立链接的 socketChannel 绑定的?
+                        其内部使用选择器(chooser),用于选择一个内部的 EventLoop，默认采用round-robin算法
+                        源码位于: io.netty.util.concurrent.MultithreadEventExecutorGroup.next
+                 */
                 childGroup.register(child).addListener(new ChannelFutureListener() {
                     @Override
                     public void operationComplete(ChannelFuture future) throws Exception {
@@ -273,6 +285,12 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
     }
 
     /**
+     * 返回已配置的 {@link EventLoopGroup}，该 EventLoopGroup 将用于子通道，如果未配置则返回null。
+     * <p>
+     * 注意: 此方法已弃用,使用 {@link #config()} 方法
+     * <p>
+     * 这里返回的是 childGroup,即: 用于处理每一个已建立连接发生的I/O读写事件
+     * <p>
      * Return the configured {@link EventLoopGroup} which will be used for the child channels or {@code null}
      * if non is configured yet.
      *
