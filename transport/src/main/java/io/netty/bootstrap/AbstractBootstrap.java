@@ -339,9 +339,19 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
             return new DefaultChannelPromise(new FailedChannel(), GlobalEventExecutor.INSTANCE).setFailure(t);
         }
 
-        // MARK
-        // 注册 channel 到 selector（每个 NioEventLoop 内部都有一个 java.nio.channels.Selector）
-        // EventLoopGroup 中的每一个 EventLoop 对象内部都封装了 java.nio.channels.Selector。
+        /*
+           MARK
+           注册 channel 到 selector（每个 NioEventLoop 内部都有一个 java.nio.channels.Selector）
+           EventLoopGroup 中的每一个 EventLoop 对象内部都封装了 java.nio.channels.Selector。
+
+           config().group(): 返回的是 parentGroup ,即:用于监听客户端连接,专门负责与客户端创建连接.
+
+           在服务端开发中,这里的 channel 指的是 NioServerSocketChannel。
+
+           因此这里可以理解为:
+                将 NioServerSocketChannel 绑定到了 parentGroup 中.
+                ServerSocketChannel 会帮忙创建 子socketChannel,然后把 子socketChannel 绑定到 childGroup 中.
+         */
         ChannelFuture regFuture = config().group().register(channel);
         if (regFuture.cause() != null) {
             if (channel.isRegistered()) {
