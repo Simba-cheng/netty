@@ -242,7 +242,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
                     将已建立链接的 socketChannel 注册到 childGroup
 
                     childGroup 是如何从内部取出一个 child，与已建立链接的 socketChannel 绑定的?
-                        其内部使用选择器(chooser),用于选择一个内部的 EventLoop，默认采用round-robin算法
+                        其内部使用选择器(chooser),用于选择一个内部的 EventLoop.
                         源码位于: io.netty.util.concurrent.MultithreadEventExecutorGroup.next
                  */
                 childGroup.register(child).addListener(new ChannelFutureListener() {
