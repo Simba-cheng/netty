@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * {@link EventExecutorGroup} 实现的抽象基类，它同时用多个线程处理它们的任务。
+ * <p>
  * Abstract base class for {@link EventExecutorGroup} implementations that handles their tasks with multiple threads at
  * the same time.
  */
@@ -159,9 +161,10 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
     }
 
     /**
+     * 创建一个新的 EventExecutor，稍后将通过 next() 方法访问它。为这个 {@link MultithreadEventExecutorGroup} 服务的每个线程都将调用这个方法。
+     * <p>
      * Create a new EventExecutor which will later then accessible via the {@link #next()}  method. This method will be
      * called for each thread that will serve this {@link MultithreadEventExecutorGroup}.
-     *
      */
     protected abstract EventExecutor newChild(Executor executor, Object... args) throws Exception;
 

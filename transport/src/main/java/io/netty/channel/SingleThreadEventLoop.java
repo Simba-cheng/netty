@@ -29,8 +29,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadFactory;
 
 /**
+ * {@link EventLoop} 的抽象基类，它在一个线程中执行所有提交的任务。
+ * <p>
  * Abstract base class for {@link EventLoop}s that execute all its submitted tasks in a single thread.
- *
  */
 public abstract class SingleThreadEventLoop extends SingleThreadEventExecutor implements EventLoop {
 
@@ -64,7 +65,12 @@ public abstract class SingleThreadEventLoop extends SingleThreadEventExecutor im
     protected SingleThreadEventLoop(EventLoopGroup parent, Executor executor,
                                     boolean addTaskWakesUp, Queue<Runnable> taskQueue, Queue<Runnable> tailTaskQueue,
                                     RejectedExecutionHandler rejectedExecutionHandler) {
+
+        // addTaskWakesUp 默认为false,用于标记 添加的任务是否会唤醒线程
+        // CALL_UP 调用父类
         super(parent, executor, addTaskWakesUp, taskQueue, rejectedExecutionHandler);
+
+        // 可以忽略
         tailTasks = ObjectUtil.checkNotNull(tailTaskQueue, "tailTaskQueue");
     }
 

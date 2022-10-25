@@ -114,7 +114,7 @@ public class NioEventLoopGroup extends MultithreadEventLoopGroup {
     }
 
     /**
-     * mark 重点关注
+     * MARK 重点关注
      *
      * @param nThreads                 内部 NioEventLoop 数量,不指定则为CPU核数的2倍
      * @param executor                 JUC中的任务执行器(线程池),每一个 EventLoop 内部都会包含一个 executor
