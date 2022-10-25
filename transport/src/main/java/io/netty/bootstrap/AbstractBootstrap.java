@@ -335,6 +335,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
             return new DefaultChannelPromise(new FailedChannel(), GlobalEventExecutor.INSTANCE).setFailure(t);
         }
 
+        // MARK
         // 注册 channel 到 selector（每个 NioEventLoop 内部都有一个 java.nio.channels.Selector）
         // EventLoopGroup 中的每一个 EventLoop 对象内部都封装了 java.nio.channels.Selector。
         ChannelFuture regFuture = config().group().register(channel);

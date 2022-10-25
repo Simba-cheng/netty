@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>io.netty.channel.nio.NioEventLoopGroup</OriginalElement>
+  <nodes>
+    <node x="-132.5" y="298.0">io.netty.util.concurrent.AbstractEventExecutorGroup</node>
+    <node x="-72.0" y="64.0">java.util.concurrent.ExecutorService</node>
+    <node x="157.0" y="142.0">java.lang.Iterable</node>
+    <node x="-9.5" y="458.0">io.netty.channel.MultithreadEventLoopGroup</node>
+    <node x="151.5" y="298.0">io.netty.channel.EventLoopGroup</node>
+    <node x="-143.0" y="378.0">io.netty.util.concurrent.MultithreadEventExecutorGroup</node>
+    <node x="-44.5" y="-14.0">java.util.concurrent.Executor</node>
+    <node x="18.5" y="220.0">io.netty.util.concurrent.EventExecutorGroup</node>
+    <node x="20.0" y="536.0">io.netty.channel.nio.NioEventLoopGroup</node>
+    <node x="-111.0" y="142.0">java.util.concurrent.ScheduledExecutorService</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="java.util.concurrent.ExecutorService" target="java.util.concurrent.Executor" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.EventLoopGroup" target="io.netty.util.concurrent.EventExecutorGroup" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="238.5" y="273.0" />
+      <point x="169.25" y="273.0" />
+      <point x="50.25" y="14.0" />
+    </edge>
+    <edge source="io.netty.util.concurrent.EventExecutorGroup" target="java.lang.Iterable" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="119.0" y="195.0" />
+      <point x="225.0" y="195.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.MultithreadEventLoopGroup" target="io.netty.util.concurrent.MultithreadEventExecutorGroup" relationship="GENERALIZATION">
+      <point x="-64.25" y="-14.0" />
+      <point x="54.75" y="432.0" />
+      <point x="-0.5" y="432.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.MultithreadEventLoopGroup" target="io.netty.channel.EventLoopGroup" relationship="REALIZATION">
+      <point x="64.25" y="-14.0" />
+      <point x="183.25" y="432.0" />
+      <point x="238.5" y="432.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="java.util.concurrent.ScheduledExecutorService" target="java.util.concurrent.ExecutorService" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.util.concurrent.MultithreadEventExecutorGroup" target="io.netty.util.concurrent.AbstractEventExecutorGroup" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.util.concurrent.AbstractEventExecutorGroup" target="io.netty.util.concurrent.EventExecutorGroup" relationship="REALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="-0.5" y="273.0" />
+      <point x="68.75" y="273.0" />
+      <point x="-50.25" y="14.0" />
+    </edge>
+    <edge source="io.netty.util.concurrent.EventExecutorGroup" target="java.util.concurrent.ScheduledExecutorService" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="119.0" y="195.0" />
+      <point x="13.0" y="195.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.nio.NioEventLoopGroup" target="io.netty.channel.MultithreadEventLoopGroup" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="1.2190635451505016" showDependencies="false" x="101.50000000000006" y="285.0" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>io.netty.channel.EventLoopGroup</OriginalElement>
+  <nodes>
+    <node x="415.8166666666667" y="142.0">io.netty.channel.SingleThreadEventLoop</node>
+    <node x="910.8166666666667" y="142.0">io.netty.channel.DefaultEventLoopGroup</node>
+    <node x="155.0" y="220.0">io.netty.channel.kqueue.KQueueEventLoop</node>
+    <node x="719.0" y="220.0">io.netty.channel.DefaultEventLoop</node>
+    <node x="362.0" y="220.0">io.netty.channel.nio.NioEventLoop</node>
+    <node x="658.8166666666667" y="142.0">io.netty.channel.kqueue.KQueueEventLoopGroup</node>
+    <node x="1291.5" y="64.0">io.netty.channel.AbstractEventLoopGroup</node>
+    <node x="535.0" y="220.0">io.netty.channel.epoll.EpollEventLoop</node>
+    <node x="1014.5" y="64.0">io.netty.channel.MultithreadEventLoopGroup</node>
+    <node x="941.0" y="-14.0">io.netty.channel.EventLoopGroup</node>
+    <node x="1156.8166666666666" y="142.0">io.netty.channel.epoll.EpollEventLoopGroup</node>
+    <node x="463.3166666666667" y="64.0">io.netty.channel.EventLoop</node>
+    <node x="1385.8166666666666" y="142.0">io.netty.channel.nio.NioEventLoopGroup</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="io.netty.channel.MultithreadEventLoopGroup" target="io.netty.channel.EventLoopGroup" relationship="REALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="1143.0" y="44.0" />
+      <point x="1276.25" y="44.0" />
+      <point x="1276.25" y="34.0" />
+      <point x="1071.5" y="34.0" />
+      <point x="43.5" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.kqueue.KQueueEventLoop" target="io.netty.channel.SingleThreadEventLoop" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="248.5" y="195.0" />
+      <point x="527.3166666666667" y="195.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.epoll.EpollEventLoop" target="io.netty.channel.SingleThreadEventLoop" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="617.0" y="195.0" />
+      <point x="527.3166666666667" y="195.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.DefaultEventLoopGroup" target="io.netty.channel.MultithreadEventLoopGroup" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="1023.8166666666667" y="117.0" />
+      <point x="1143.0" y="117.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.DefaultEventLoop" target="io.netty.channel.SingleThreadEventLoop" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="809.5" y="195.0" />
+      <point x="527.3166666666667" y="195.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.SingleThreadEventLoop" target="io.netty.channel.EventLoop" relationship="REALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.AbstractEventLoopGroup" target="io.netty.channel.EventLoopGroup" relationship="REALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="1409.5" y="44.0" />
+      <point x="1276.25" y="44.0" />
+      <point x="1276.25" y="34.0" />
+      <point x="1071.5" y="34.0" />
+      <point x="43.5" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.EventLoop" target="io.netty.channel.EventLoopGroup" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="527.3166666666667" y="44.0" />
+      <point x="984.5" y="44.0" />
+      <point x="-43.5" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.kqueue.KQueueEventLoopGroup" target="io.netty.channel.MultithreadEventLoopGroup" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="774.8166666666667" y="117.0" />
+      <point x="1143.0" y="117.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.nio.NioEventLoopGroup" target="io.netty.channel.MultithreadEventLoopGroup" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="1484.8166666666666" y="117.0" />
+      <point x="1143.0" y="117.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.nio.NioEventLoop" target="io.netty.channel.SingleThreadEventLoop" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="438.5" y="195.0" />
+      <point x="527.3166666666667" y="195.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.epoll.EpollEventLoopGroup" target="io.netty.channel.MultithreadEventLoopGroup" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="1261.3166666666666" y="117.0" />
+      <point x="1143.0" y="117.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="1.0317460317460319" showDependencies="false" x="879.4999999999999" y="127.0" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
