@@ -146,6 +146,8 @@ public final class NioEventLoop extends SingleThreadEventLoop {
 
         this.provider = ObjectUtil.checkNotNull(selectorProvider, "selectorProvider");
         this.selectStrategy = ObjectUtil.checkNotNull(strategy, "selectStrategy");
+
+        // MARK 创建 selector
         final SelectorTuple selectorTuple = openSelector();
         this.selector = selectorTuple.selector;
         this.unwrappedSelector = selectorTuple.unwrappedSelector;
@@ -176,6 +178,8 @@ public final class NioEventLoop extends SingleThreadEventLoop {
 
     private SelectorTuple openSelector() {
         final Selector unwrappedSelector;
+
+        // 创建 selector
         try {
             unwrappedSelector = provider.openSelector();
         } catch (IOException e) {

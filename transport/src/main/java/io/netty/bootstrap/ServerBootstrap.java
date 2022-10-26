@@ -143,9 +143,20 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
 
     @Override
     void init(Channel channel) {
-        // 为 ServerSocketChannel 配置TCP等参数
+        /*
+            为 ServerSocketChannel 配置TCP等参数
+
+            newOptionsArray()方法返回的就是 由'serverBootstrap.option'方法添加的参数
+            @see io.netty.bootstrap.AbstractBootstrap.option
+         */
         setChannelOptions(channel, newOptionsArray(), logger);
-        // 为 ServerSocketChannel 配置自定义属性
+
+        /*
+            为 ServerSocketChannel 配置自定义属性
+
+            newAttributesArray()方法返回的就是 由'serverBootstrap.attr'方法添加的 自定义属性
+            @see io.netty.bootstrap.AbstractBootstrap.attr
+         */
         setAttributes(channel, newAttributesArray());
 
         ChannelPipeline p = channel.pipeline();
