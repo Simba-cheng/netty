@@ -161,13 +161,22 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
 
         ChannelPipeline p = channel.pipeline();
 
-        // MARK 获取 childGroup,即: 用于处理每一个已建立连接发生的I/O读写事件
+        // 以下四个参数用于初始化 socketChannel 使用,也就是child,即:用于处理每一个已建立连接发生的I/O读写事件
+
+        // 获取 childGroup,即: 用于处理每一个已建立连接发生的I/O读写事件
         final EventLoopGroup currentChildGroup = childGroup;
         final ChannelHandler currentChildHandler = childHandler;
         final Entry<ChannelOption<?>, Object>[] currentChildOptions = newOptionsArray(childOptions);
         final Entry<AttributeKey<?>, Object>[] currentChildAttrs = newAttributesArray(childAttrs);
 
-        // 装配 pipeline 流水线
+        /*
+            装配 pipeline 流水线
+
+            ChannelInitializer 一次性、初始化handler
+                它会添加 ServerBootstrapAcceptor handler，添加完成后自己就移除了。
+                ServerBootstrapAcceptor handler 负责与客户端建立连接
+
+         */
         p.addLast(new ChannelInitializer<Channel>() {
             @Override
             public void initChannel(final Channel ch) {
@@ -175,7 +184,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
                 // 注意：这里的 ch 就是上面的ServerSocketChannel
                 final ChannelPipeline pipeline = ch.pipeline();
 
-                // 这个Handler就是我们通过ServerBootstrap.handler(XXX)装配的
+                // 这个Handler就是由'serverBootstrap.handler'添加的
                 ChannelHandler handler = config.handler();
                 if (handler != null) {
                     // 将自定义的Handler添加到Pipeline中
