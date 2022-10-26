@@ -377,6 +377,14 @@ public abstract class AbstractNioChannel extends AbstractChannel {
         boolean selected = false;
         for (;;) {
             try {
+                /*
+                    MARK 调用NIO
+
+                    将当前 channel 注册到 selector上(nioEventLoop 中绑定的 selector)
+
+                    ops=0: 当前感兴趣的事件是0,并未开始接收链接
+                    attr=this:
+                 */
                 selectionKey = javaChannel().register(eventLoop().unwrappedSelector(), 0, this);
                 return;
             } catch (CancelledKeyException e) {
