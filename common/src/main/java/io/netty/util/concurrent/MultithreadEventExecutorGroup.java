@@ -66,12 +66,12 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
      * Create a new instance.
      *
      * @param nThreads       the number of threads that will be used by this instance.
-     *                       内部 EventLoop(NioEventLoop) 数量,不指定则为CPU核数的2倍
+     *                       内部 eventLoop(NioEventLoop) 数量,不指定则为CPU核数的2倍
      * @param executor       the Executor to use, or {@code null} if the default should be used.
-     *                       JUC中的任务执行器(线程池),默认为null,每一个 EventLoop 内部都会包含一个 executor
+     *                       JUC中的任务执行器(线程池),默认为null,每一个 eventLoop 内部都会包含一个 executor
      * @param chooserFactory the {@link EventExecutorChooserFactory} to use.
      *                       用于创建 Chooser 对象的工厂类
-     *                       Chooser可以看成一个负载均衡器,用于从 NioEventLoopGroup 中选择一个 EventLoop
+     *                       Chooser可以看成一个负载均衡器,用于从 NioEventLoopGroup 中选择一个 eventLoop
      * @param args           arguments which will passed to each {@link #newChild(Executor, Object...)} call
      */
     protected MultithreadEventExecutorGroup(int nThreads, Executor executor,
@@ -90,7 +90,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
         for (int i = 0; i < nThreads; i ++) {
             boolean success = false;
             try {
-                // 创建 EventLoop 对象
+                // 创建 eventLoop 对象
                 children[i] = newChild(executor, args);
                 success = true;
             } catch (Exception e) {
@@ -118,7 +118,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
             }
         }
 
-        // Chooser 本质可以看成一个负载均衡器，用于选择一个内部的 EventLoop，默认采用round-robin算法
+        // Chooser 本质可以看成一个负载均衡器，用于选择一个内部的 eventLoop，默认采用round-robin算法
         chooser = chooserFactory.newChooser(children);
 
         final FutureListener<Object> terminationListener = new FutureListener<Object>() {
