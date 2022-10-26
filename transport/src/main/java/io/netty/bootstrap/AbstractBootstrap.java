@@ -296,7 +296,6 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
 
         if (regFuture.isDone()) {
             // 注册完成并且成功
-            // At this point we know that the registration was complete and successful.
 
             ChannelPromise promise = channel.newPromise();
 
@@ -304,8 +303,8 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
             doBind0(regFuture, channel, localAddress, promise);
             return promise;
         } else {
-            // 此时注册还没有完成,但总是会完成的
-            // Registration future is almost always fulfilled already, but just in case it's not.
+            // 由于是异步,此时注册还没有完成,但总是会完成的
+
             final PendingRegistrationPromise promise = new PendingRegistrationPromise(channel);
             // 添加回调监听器
             regFuture.addListener(new ChannelFutureListener() {
