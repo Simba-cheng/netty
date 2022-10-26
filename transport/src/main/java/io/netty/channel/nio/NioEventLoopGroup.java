@@ -195,7 +195,9 @@ public class NioEventLoopGroup extends MultithreadEventLoopGroup {
         // SelectStrategy 是 Netty 用来控制 eventLoop 轮询方式的策略，此处 args[0] = DefaultSelectStrategyFactory.INSTANCE；
         SelectStrategyFactory selectStrategyFactory = (SelectStrategyFactory) args[1];
 
+        // 线程池的任务拒绝策略,默认是抛出 RejectedExecutionException 异常；
         RejectedExecutionHandler rejectedExecutionHandler = (RejectedExecutionHandler) args[2];
+
         EventLoopTaskQueueFactory taskQueueFactory = null;
         EventLoopTaskQueueFactory tailTaskQueueFactory = null;
 
