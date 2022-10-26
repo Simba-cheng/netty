@@ -198,7 +198,10 @@ public class NioEventLoopGroup extends MultithreadEventLoopGroup {
         // 线程池的任务拒绝策略,默认是抛出 RejectedExecutionException 异常；
         RejectedExecutionHandler rejectedExecutionHandler = (RejectedExecutionHandler) args[2];
 
+        // 任务队列工厂类，每一个EventLoop对象内部都会包含一个任务队列
+        // 这个工厂类就是用来创建队列的，默认会创建一个Netty自定义线程安全的 MpscUnboundedArrayQueue 无锁队列。
         EventLoopTaskQueueFactory taskQueueFactory = null;
+
         EventLoopTaskQueueFactory tailTaskQueueFactory = null;
 
         int argsLength = args.length;
