@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>io.netty.channel.EventLoop</OriginalElement>
+  <nodes>
+    <node x="248.0" y="142.0">io.netty.channel.kqueue.KQueueEventLoop</node>
+    <node x="701.0" y="64.0">io.netty.channel.AbstractEventLoop</node>
+    <node x="513.0" y="-14.0">io.netty.channel.EventLoop</node>
+    <node x="628.0" y="142.0">io.netty.channel.ThreadPerChannelEventLoop</node>
+    <node x="64.0" y="142.0">io.netty.channel.epoll.EpollEventLoop</node>
+    <node x="473.0" y="64.0">io.netty.channel.embedded.EmbeddedEventLoop</node>
+    <node x="455.0" y="142.0">io.netty.channel.nio.NioEventLoop</node>
+    <node x="230.0" y="64.0">io.netty.channel.SingleThreadEventLoop</node>
+    <node x="-137.0" y="142.0">io.netty.channel.DefaultEventLoop</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="io.netty.channel.kqueue.KQueueEventLoop" target="io.netty.channel.SingleThreadEventLoop" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.epoll.EpollEventLoop" target="io.netty.channel.SingleThreadEventLoop" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="146.0" y="117.0" />
+      <point x="341.5" y="117.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.DefaultEventLoop" target="io.netty.channel.SingleThreadEventLoop" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="-46.5" y="117.0" />
+      <point x="341.5" y="117.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.embedded.EmbeddedEventLoop" target="io.netty.channel.EventLoop" relationship="REALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.SingleThreadEventLoop" target="io.netty.channel.EventLoop" relationship="REALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="341.5" y="39.0" />
+      <point x="577.0" y="39.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.AbstractEventLoop" target="io.netty.channel.EventLoop" relationship="REALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="796.5" y="39.0" />
+      <point x="577.0" y="39.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.ThreadPerChannelEventLoop" target="io.netty.channel.SingleThreadEventLoop" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="760.5" y="117.0" />
+      <point x="341.5" y="117.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="io.netty.channel.nio.NioEventLoop" target="io.netty.channel.SingleThreadEventLoop" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="531.5" y="117.0" />
+      <point x="341.5" y="117.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="378.0" y="78.0" />
+  <SelectedNodes>
+    <node>io.netty.channel.epoll.EpollEventLoop</node>
+  </SelectedNodes>
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
