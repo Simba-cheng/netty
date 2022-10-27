@@ -1,0 +1,60 @@
+@startuml
+participant Actor
+
+Actor -> AbstractBootstrap : doBind
+activate AbstractBootstrap
+
+AbstractBootstrap -> AbstractBootstrap : 1 initAndRegister
+activate AbstractBootstrap
+AbstractBootstrap --> AbstractBootstrap
+deactivate AbstractBootstrap
+
+== initAndRegister start ==
+AbstractBootstrap -> ChannelFactory : 1.1 newChannel
+activate ChannelFactory
+ChannelFactory --> AbstractBootstrap
+deactivate ChannelFactory
+
+AbstractBootstrap -> ServerBootstrap : 1.2 init \n 调用子类实现的init方法
+activate ServerBootstrap
+ServerBootstrap --> AbstractBootstrap
+deactivate ServerBootstrap
+
+== init start==
+ServerBootstrap [#EE7621]-> AbstractBootstrap : \n 1.2.1 setChannelOptions \n 调用父类的setChannelOptions方法
+activate AbstractBootstrap
+AbstractBootstrap --> ServerBootstrap
+deactivate AbstractBootstrap
+
+ServerBootstrap [#EE7621]-> AbstractBootstrap : \n 1.2.2 setAttributes \n 调用父类的setAttributes方法
+activate AbstractBootstrap
+AbstractBootstrap --> ServerBootstrap
+deactivate AbstractBootstrap
+
+== init end ==
+
+AbstractBootstrap -> EventLoopGroup : register
+activate EventLoopGroup
+EventLoopGroup --> AbstractBootstrap
+deactivate EventLoopGroup
+
+== initAndRegister end ==
+
+
+
+
+
+'alt 注册完成并且成功
+'    AbstractBootstrap -> AbstractBootstrap : \n 2 doBind
+'    activate AbstractBootstrap
+'    AbstractBootstrap --> AbstractBootstrap
+'    deactivate AbstractBootstrap
+'else 异步,此时注册还没有完成,但总是会完成的
+'    AbstractBootstrap -> AbstractBootstrap : \n 2 doBind
+'    activate AbstractBootstrap
+'    AbstractBootstrap --> AbstractBootstrap
+'    deactivate AbstractBootstrap
+'end
+
+return
+@enduml
