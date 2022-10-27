@@ -50,10 +50,10 @@ activate EventLoopGroup
 EventLoopGroup --> AbstractBootstrap
 deactivate EventLoopGroup
 
+'== 1.3 register start==
+'== 1.3 register end==
+
 == initAndRegister end ==
-
-
-
 
 
 'alt 注册完成并且成功
