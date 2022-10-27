@@ -4,7 +4,7 @@ Actor -> NioEventLoopGroup: 1.0 create
 NioEventLoopGroup -> MultithreadEventLoopGroup: 1.1 调用父类构造器
 MultithreadEventLoopGroup -> MultithreadEventExecutorGroup: 1.2 调用父类构造器
 MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: 1.2.1 初始化内部eventLoop数组
-loop foreach # 根据 nThread 数量创建 eventLoop
+loop for # 根据 nThread 数量创建 eventLoop
 MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: 1.2.2 创建eventLoop(newChild method)
 end
 
