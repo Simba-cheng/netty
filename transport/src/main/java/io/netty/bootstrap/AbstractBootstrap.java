@@ -289,6 +289,11 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
             这是一个异步的过程
          */
         final ChannelFuture regFuture = initAndRegister();
+
+        /*
+            此处的channel,对于 ServerBootstrap 来说,一般是 NioServerSocketChannel
+            channel具体类型,是由'serverBootstrap.channel'方法设置的。
+         */
         final Channel channel = regFuture.channel();
         if (regFuture.cause() != null) {
             return regFuture;
@@ -392,10 +397,8 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
         // 向ServerSocketChannel所属的EventLoop中提交一个异步任务
 
         /*
-            This method is invoked before channelRegistered() is triggered.  Give user handlers a chance to set up
-            the pipeline in its channelRegistered() implementation.
-
             在channelRegistered()被触发之前调用此方法。让用户处理程序有机会在其channelRegistered()实现中设置管道。
+            此处的channel,对于 ServerBootstrap 来说,一般是 NioServerSocketChannel,channel具体类型,是由'serverBootstrap.channel'方法设置的。
          */
         channel.eventLoop().execute(new Runnable() {
             @Override
