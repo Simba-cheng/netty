@@ -118,7 +118,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
             }
         }
 
-        // Chooser 本质可以看成一个负载均衡器，用于选择一个内部的 eventLoop，默认采用round-robin算法
+        // Chooser 本质可以看成一个负载均衡器，用于选择一个内部的 eventLoop
         chooser = chooserFactory.newChooser(children);
 
         final FutureListener<Object> terminationListener = new FutureListener<Object>() {
