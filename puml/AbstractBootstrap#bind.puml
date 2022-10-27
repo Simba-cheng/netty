@@ -4,23 +4,25 @@ participant Actor
 Actor -> AbstractBootstrap : doBind
 activate AbstractBootstrap
 
-AbstractBootstrap -> AbstractBootstrap : 1 initAndRegister
+AbstractBootstrap -> AbstractBootstrap : <color:#228B22>1 initAndRegister</color>
 activate AbstractBootstrap
 AbstractBootstrap --> AbstractBootstrap
 deactivate AbstractBootstrap
 
-== initAndRegister start ==
-AbstractBootstrap -> ChannelFactory : 1.1 newChannel
+== 1 initAndRegister start ==
+AbstractBootstrap -> ChannelFactory : <color:#009ACD>1.1 newChannel</color>
 activate ChannelFactory
 ChannelFactory --> AbstractBootstrap
 deactivate ChannelFactory
 
-AbstractBootstrap -> ServerBootstrap : 1.2 init \n 调用子类实现的init方法
+activate ServerBootstrap
+
+AbstractBootstrap -> ServerBootstrap : <color:#009ACD>1.2 init</color> \n <color:#009ACD>调用子类实现的init方法</color>
 activate ServerBootstrap
 ServerBootstrap --> AbstractBootstrap
 deactivate ServerBootstrap
 
-== init start==
+== 1.2 init start==
 ServerBootstrap [#EE7621]-> AbstractBootstrap : \n 1.2.1 setChannelOptions \n 调用父类的setChannelOptions方法
 activate AbstractBootstrap
 AbstractBootstrap --> ServerBootstrap
@@ -31,9 +33,19 @@ activate AbstractBootstrap
 AbstractBootstrap --> ServerBootstrap
 deactivate AbstractBootstrap
 
+ServerBootstrap -> AbstractChannel : 1.2.3 pipeline
+activate AbstractChannel
+AbstractChannel --> ServerBootstrap
+deactivate AbstractChannel
+
+ServerBootstrap -> ServerBootstrapAcceptor : \n 1.2.4 create and add to serverSocketChannel
+activate ServerBootstrapAcceptor
+ServerBootstrapAcceptor --> ServerBootstrap
+deactivate ServerBootstrapAcceptor
+
 == init end ==
 
-AbstractBootstrap -> EventLoopGroup : register
+AbstractBootstrap -> EventLoopGroup : <color:#009ACD>1.3 register</color>
 activate EventLoopGroup
 EventLoopGroup --> AbstractBootstrap
 deactivate EventLoopGroup
