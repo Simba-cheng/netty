@@ -57,8 +57,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     private static final Map.Entry<AttributeKey<?>, Object>[] EMPTY_ATTRIBUTE_ARRAY = new Map.Entry[0];
 
     /**
-     * 这里保存的是 parentGroup
-     * 即:用于监听客户端连接,专门负责与客户端创建连接
+     * parentGroup 用于监听客户端连接,专门负责与客户端创建连接
      */
     volatile EventLoopGroup group;
     @SuppressWarnings("deprecation")
