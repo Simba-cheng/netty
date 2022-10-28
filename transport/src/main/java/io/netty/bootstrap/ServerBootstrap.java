@@ -53,8 +53,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
     private final ServerBootstrapConfig config = new ServerBootstrapConfig(this);
 
     /**
-     * 这里保存的是 childGroup
-     * 即: 用于处理每一个已建立连接发生的I/O读写事件
+     * childGroup 用于处理每一个已建立连接发生的I/O读写事件
      */
     private volatile EventLoopGroup childGroup;
     private volatile ChannelHandler childHandler;
@@ -141,11 +140,14 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         return this;
     }
 
+    /**
+     * 初始化 channel
+     * @param channel NioServerSocketChannel,由'serverBootstrap.channel'方法设置
+     */
     @Override
     void init(Channel channel) {
         /*
             为 ServerSocketChannel 配置TCP等参数
-            此处返回channel具体类型,是由'serverBootstrap.channel'方法设置的。
 
             newOptionsArray()方法返回的就是 由'serverBootstrap.option'方法添加的参数
             @see io.netty.bootstrap.AbstractBootstrap.option
@@ -154,17 +156,16 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
 
         /*
             为 ServerSocketChannel 配置自定义属性
-            此处返回channel具体类型,是由'serverBootstrap.channel'方法设置的。
 
             newAttributesArray()方法返回的就是 由'serverBootstrap.attr'方法添加的 自定义属性
             @see io.netty.bootstrap.AbstractBootstrap.attr
          */
         setAttributes(channel, newAttributesArray());
 
-        // 从 ServerSocketChannel 中取出 pipeline 链表
+        // 从 ServerSocketChannel 中取出 pipeline
         ChannelPipeline p = channel.pipeline();
 
-        // 以下四个参数用于初始化 socketChannel 使用,也就是child,即:用于处理每一个已建立连接发生的I/O读写事件
+        // 以下四个参数用于初始化 childGroup 中的 child,即:用于处理每一个已建立连接发生的I/O读写事件
 
         // 获取 childGroup,即: 用于处理每一个已建立连接发生的I/O读写事件
         final EventLoopGroup currentChildGroup = childGroup;

@@ -333,15 +333,13 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     }
 
     final ChannelFuture initAndRegister() {
+
+        // 对于 ServerBootstrap 来说,一般是 NioServerSocketChannel,返回具体类型是由'serverBootstrap.channel'方法设置
         Channel channel = null;
         try {
-            /*
-                创建 channel,对于 ServerBootstrap 来说,一般是 NioServerSocketChannel
-                此处返回channel具体类型,是由'serverBootstrap.channel'方法设置的。
-             */
             channel = channelFactory.newChannel();
 
-            // MARK 初始化 channel(NioServerSocketChannel)
+            // 初始化 channel(NioServerSocketChannel)
             init(channel);
 
         } catch (Throwable t) {
