@@ -90,7 +90,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
         for (int i = 0; i < nThreads; i ++) {
             boolean success = false;
             try {
-                // 创建 eventLoop 对象
+                // 创建 eventLoop 对象,添加到 children 数组中
                 children[i] = newChild(executor, args);
                 success = true;
             } catch (Exception e) {

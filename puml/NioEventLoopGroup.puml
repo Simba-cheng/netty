@@ -10,18 +10,18 @@ MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: 4.0 没有指定
 MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: \n 4.1 初始化内部eventLoop数组
 
 ' ----- 分割线 -----
-loop for # 根据 nThread 数量创建 eventLoop
+loop for # 根据 nThread 数量创建 eventLoop ,并添加到eventLoop数组中
 MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: 4.2 创建eventLoop \n (newChild method)
 NioEventLoopGroup <-[#EE7621] MultithreadEventExecutorGroup: 4.2.1 调用子类实现的newChild方法
-NioEventLoopGroup -> NioEventLoop: \n 4.2.2 create
+NioEventLoopGroup -> NioEventLoop: \n 4.2.2 create <color:#FF3030>NioEventLoop</color>
 NioEventLoop -> SingleThreadEventExecutor: \n 4.2.3 调用父类构造器
 SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 4.2.4 初始化eventLoop内部任务队列 \n (<color:#FF3030>taskQueue#Runnable</color>)
-NioEventLoop <-- SingleThreadEventExecutor
+NioEventLoop <-- SingleThreadEventExecutor: \n 
 NioEventLoop -> NioEventLoop: \n 4.2.5 <color:#FF3030>创建selector</color>
 end
 ' ----- 分割线 -----
 
-MultithreadEventExecutorGroup -> DefaultEventExecutorChooserFactory: \n 4.3 创建chooser选择器 \n (用于选择内部eventLoop)
+MultithreadEventExecutorGroup -> DefaultEventExecutorChooserFactory: \n 4.3 创建chooser选择器 \n (用于从eventLoop数组中选择eventLoop)
 
-Actor <-- MultithreadEventExecutorGroup: return
+Actor <-- MultithreadEventExecutorGroup: \n 
 @enduml
