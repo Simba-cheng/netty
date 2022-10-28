@@ -95,6 +95,10 @@ public abstract class SingleThreadEventLoop extends SingleThreadEventExecutor im
         return register(new DefaultChannelPromise(channel, this));
     }
 
+    /**
+     * @param promise 包装过的channel
+     *                可能是 parentGroup 中的 NioServerSocketChannel,也可能是 childGroup 中已建立连接的 nioSocketChannel
+     */
     @Override
     public ChannelFuture register(final ChannelPromise promise) {
         ObjectUtil.checkNotNull(promise, "promise");

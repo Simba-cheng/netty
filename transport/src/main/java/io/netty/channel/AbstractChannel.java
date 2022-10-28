@@ -461,6 +461,11 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             return remoteAddress0();
         }
 
+        /**
+         * @param eventLoop parentGroup、childGroup
+         * @param promise   包装过的channel
+         *                  可能是 parentGroup 中的 NioServerSocketChannel,也可能是 childGroup 中已建立连接的 nioSocketChannel
+         */
         @Override
         public final void register(EventLoop eventLoop, final ChannelPromise promise) {
             ObjectUtil.checkNotNull(eventLoop, "eventLoop");
@@ -499,6 +504,10 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             }
         }
 
+        /**
+         * @param promise 包装过的channel
+         *                可能是 parentGroup 中的 NioServerSocketChannel,也可能是 childGroup 中已建立连接的 nioSocketChannel
+         */
         private void register0(ChannelPromise promise) {
             try {
                 // check if the channel is still open as it could be closed in the mean time when the register
