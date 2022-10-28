@@ -87,7 +87,7 @@ public abstract class MultithreadEventLoopGroup extends MultithreadEventExecutor
     public ChannelFuture register(Channel channel) {
         /*
             对于 ServerBootstrap 来说,一般是 NioServerSocketChannel
-            此处返回channel具体类型,是由'serverBootstrap.channel'方法设置的。
+            此处返回channel具体类型,是由 serverBootstrap.channel 方法设置的。
          */
         return next().register(channel);
     }

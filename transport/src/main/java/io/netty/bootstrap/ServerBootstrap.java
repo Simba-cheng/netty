@@ -142,14 +142,14 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
 
     /**
      * 初始化 channel
-     * @param channel NioServerSocketChannel,由'serverBootstrap.channel'方法设置
+     * @param channel NioServerSocketChannel,由 serverBootstrap.channel 方法设置
      */
     @Override
     void init(Channel channel) {
         /*
             为 NioServerSocketChannel 配置TCP等参数
 
-            newOptionsArray()方法返回的就是 由'serverBootstrap.option'方法添加的参数
+            newOptionsArray()方法返回的就是 由 serverBootstrap.option 方法添加的参数
             @see io.netty.bootstrap.AbstractBootstrap.option
          */
         setChannelOptions(channel, newOptionsArray(), logger);
@@ -157,7 +157,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         /*
             为 NioServerSocketChannel 配置自定义属性
 
-            newAttributesArray()方法返回的就是 由'serverBootstrap.attr'方法添加的 自定义属性
+            newAttributesArray()方法返回的就是 由 serverBootstrap.attr 方法添加的 自定义属性
             @see io.netty.bootstrap.AbstractBootstrap.attr
          */
         setAttributes(channel, newAttributesArray());
@@ -188,7 +188,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
                 // 从 NioServerSocketChannel 中取出 pipeline
                 final ChannelPipeline pipeline = ch.pipeline();
 
-                // 将由'serverBootstrap.handler'配置的handler,添加到 NioServerSocketChannel 的 pipeline 中。
+                // 将由 serverBootstrap.handler 配置的handler,添加到 NioServerSocketChannel 的 pipeline 中。
                 ChannelHandler handler = config.handler();
                 if (handler != null) {
                     pipeline.addLast(handler);
@@ -198,7 +198,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
                 ch.eventLoop().execute(new Runnable() {
                     @Override
                     public void run() {
-                        // MARK ServerBootstrapAcceptor 用于将建立连接的 SocketChannel 转发给 childGroup
+                        // ServerBootstrapAcceptor 用于将建立连接的 SocketChannel 转发给 childGroup
                         pipeline.addLast(new ServerBootstrapAcceptor(
                                 ch, currentChildGroup, currentChildHandler, currentChildOptions, currentChildAttrs));
                     }
@@ -222,12 +222,34 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
 
     private static class ServerBootstrapAcceptor extends ChannelInboundHandlerAdapter {
 
+        /**
+         * 用于处理每一个已建立连接发生的I/O读写事件
+         */
         private final EventLoopGroup childGroup;
+
+        /**
+         * 由 serverBootstrap.childHandler 方法设置
+         */
         private final ChannelHandler childHandler;
+
+        /**
+         * 由 serverBootstrap.childOption 方法设置
+         */
         private final Entry<ChannelOption<?>, Object>[] childOptions;
+
+        /**
+         * 由 serverBootstrap.childAttr 方法设置
+         */
         private final Entry<AttributeKey<?>, Object>[] childAttrs;
         private final Runnable enableAutoReadTask;
 
+        /**
+         * @param channel      NioServerSocketChannel,由 serverBootstrap.channel 方法设置
+         * @param childGroup   用于处理每一个已建立连接发生的I/O读写事件
+         * @param childHandler 由 serverBootstrap.childHandler 方法设置
+         * @param childOptions 由 serverBootstrap.childOption 方法设置
+         * @param childAttrs   由 serverBootstrap.childAttr 方法设置
+         */
         ServerBootstrapAcceptor(
                 final Channel channel, EventLoopGroup childGroup, ChannelHandler childHandler,
                 Entry<ChannelOption<?>, Object>[] childOptions, Entry<AttributeKey<?>, Object>[] childAttrs) {
@@ -255,6 +277,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
             // 此处的 msg,是已建立链接的 socketChannel,因此可以直接强转
             final Channel child = (Channel) msg;
 
+            // 将 childHandler 添加到 已建立连接 channel 的 pipeline 中。
             child.pipeline().addLast(childHandler);
 
             setChannelOptions(child, childOptions, logger);

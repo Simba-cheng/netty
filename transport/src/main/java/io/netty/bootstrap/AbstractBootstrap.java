@@ -291,7 +291,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
 
         /*
             此处的channel,对于 ServerBootstrap 来说,一般是 NioServerSocketChannel
-            channel具体类型,是由'serverBootstrap.channel'方法设置的。
+            channel具体类型,是由 serverBootstrap.channel 方法设置的。
          */
         final Channel channel = regFuture.channel();
         if (regFuture.cause() != null) {
@@ -334,7 +334,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
 
     final ChannelFuture initAndRegister() {
 
-        // 对于 ServerBootstrap 来说,一般是 NioServerSocketChannel,返回具体类型是由'serverBootstrap.channel'方法设置
+        // 对于 ServerBootstrap 来说,一般是 NioServerSocketChannel,返回具体类型是由 serverBootstrap.channel 方法设置
         Channel channel = null;
         try {
             channel = channelFactory.newChannel();
@@ -395,7 +395,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
 
         /*
             在channelRegistered()被触发之前调用此方法。让用户处理程序有机会在其channelRegistered()实现中设置管道。
-            此处的channel,对于 ServerBootstrap 来说,一般是 NioServerSocketChannel,channel具体类型,是由'serverBootstrap.channel'方法设置的。
+            此处的channel,对于 ServerBootstrap 来说,一般是 NioServerSocketChannel,channel具体类型,是由 serverBootstrap.channel 方法设置的。
          */
         channel.eventLoop().execute(new Runnable() {
             @Override

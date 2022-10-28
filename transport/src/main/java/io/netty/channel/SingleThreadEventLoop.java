@@ -88,7 +88,7 @@ public abstract class SingleThreadEventLoop extends SingleThreadEventExecutor im
     public ChannelFuture register(Channel channel) {
          /*
             对于 ServerBootstrap 来说,一般是 NioServerSocketChannel
-            此处返回channel具体类型,是由'serverBootstrap.channel'方法设置的。
+            此处返回channel具体类型,是由 serverBootstrap.channel 方法设置的。
          */
         return register(new DefaultChannelPromise(channel, this));
     }
@@ -99,7 +99,7 @@ public abstract class SingleThreadEventLoop extends SingleThreadEventExecutor im
 
         /*
             对于 ServerBootstrap 来说,一般是 NioServerSocketChannel
-            此处返回channel具体类型,是由'serverBootstrap.channel'方法设置的。
+            此处返回channel具体类型,是由 serverBootstrap.channel 方法设置的。
 
             register方法 调用 => io.netty.channel.AbstractChannel.AbstractUnsafe.register
          */
