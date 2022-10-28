@@ -2,18 +2,26 @@
 
 Actor -> NioEventLoopGroup: 1 create
 NioEventLoopGroup -> MultithreadEventLoopGroup: 2 调用父类构造器
-MultithreadEventLoopGroup -> MultithreadEventExecutorGroup: 3 调用父类构造器
-MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: 4 初始化内部eventLoop数组
-loop for # 根据 nThread 数量创建 eventLoop
-MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: 4.1 创建eventLoop \n (newChild method)
-NioEventLoopGroup <-[#EE7621] MultithreadEventExecutorGroup: 4.1.1 调用子类实现的newChild方法
-NioEventLoopGroup -> NioEventLoop: 4.1.2 create
-NioEventLoop -> SingleThreadEventExecutor: 4.1.3 调用父类构造器
-SingleThreadEventExecutor -> SingleThreadEventExecutor: 4.1.4 初始化eventLoop内部任务队列 \n (<color:#FF3030>taskQueue#Runnable</color>)
-NioEventLoop <-- SingleThreadEventExecutor
-NioEventLoop -> NioEventLoop: 4.1.5 <color:#FF3030>创建selector</color>
-end
-MultithreadEventExecutorGroup -> DefaultEventExecutorChooserFactory: 4.2 创建chooser选择器 \n (用于选择内部eventLoop)
 
-Actor <-- MultithreadEventExecutorGroup
+MultithreadEventLoopGroup -> MultithreadEventExecutorGroup: 3 调用父类构造器
+
+MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: 4.0 没有指定线程池(executor) \n 创建默认线程池 <color:#FF3030>ThreadPerTaskExecutor</color>
+
+MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: \n 4.1 初始化内部eventLoop数组
+
+' ----- 分割线 -----
+loop for # 根据 nThread 数量创建 eventLoop
+MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: 4.2 创建eventLoop \n (newChild method)
+NioEventLoopGroup <-[#EE7621] MultithreadEventExecutorGroup: 4.2.1 调用子类实现的newChild方法
+NioEventLoopGroup -> NioEventLoop: \n 4.2.2 create
+NioEventLoop -> SingleThreadEventExecutor: \n 4.2.3 调用父类构造器
+SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 4.2.4 初始化eventLoop内部任务队列 \n (<color:#FF3030>taskQueue#Runnable</color>)
+NioEventLoop <-- SingleThreadEventExecutor
+NioEventLoop -> NioEventLoop: \n 4.2.5 <color:#FF3030>创建selector</color>
+end
+' ----- 分割线 -----
+
+MultithreadEventExecutorGroup -> DefaultEventExecutorChooserFactory: \n 4.3 创建chooser选择器 \n (用于选择内部eventLoop)
+
+Actor <-- MultithreadEventExecutorGroup: return
 @enduml
