@@ -121,7 +121,6 @@ public class NioEventLoopGroup extends MultithreadEventLoopGroup {
      *                                 默认为 ThreadPerTaskExecutor,即为每个任务创建一个线程处理。
      * @param chooserFactory           用于创建 Chooser 对象的工厂类
      *                                 Chooser可以看成一个负载均衡器,用于从 NioEventLoopGroup 中选择一个 EventLoop
-     *                                 默认采用round-robin算法；
      * @param selectorProvider         NIO工具类
      *                                 SelectorProvider使用了JDK的 SPI机制 来创建Selector、ServerSocketChannel、SocketChannel 等对象；
      * @param selectStrategyFactory    用来创建 SelectStrategy 的工厂
