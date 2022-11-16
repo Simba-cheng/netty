@@ -46,7 +46,10 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 /**
  * Abstract base class for {@link OrderedEventExecutor}'s that execute all its submitted tasks in a single thread.
+ * <p>
+ * NioEventLoop 是基于 SingleThreadEventExecutor 而实现的，非IO相关的功能全部在 SingleThreadEventExecutor 中。
  *
+ * 在单个线程中执行所有提交的任务
  */
 public abstract class SingleThreadEventExecutor extends AbstractScheduledEventExecutor implements OrderedEventExecutor {
 
@@ -56,10 +59,29 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
     private static final InternalLogger logger =
             InternalLoggerFactory.getInstance(SingleThreadEventExecutor.class);
 
+    /**
+     * 状态 未启动
+     */
     private static final int ST_NOT_STARTED = 1;
+
+    /**
+     * 状态 已启动
+     */
     private static final int ST_STARTED = 2;
+
+    /**
+     * 状态 关闭中(平滑关闭)
+     */
     private static final int ST_SHUTTING_DOWN = 3;
+
+    /**
+     * 状态 已关闭
+     */
     private static final int ST_SHUTDOWN = 4;
+
+    /**
+     * 状态 终止
+     */
     private static final int ST_TERMINATED = 5;
 
     private static final Runnable NOOP_TASK = new Runnable() {
@@ -75,18 +97,36 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
             AtomicReferenceFieldUpdater.newUpdater(
                     SingleThreadEventExecutor.class, ThreadProperties.class, "threadProperties");
 
+    /**
+     * 阻塞任务队列 {@link LinkedBlockingQueue}
+     */
     private final Queue<Runnable> taskQueue;
 
+    /**
+     * 工作线程
+     */
     private volatile Thread thread;
     @SuppressWarnings("unused")
     private volatile ThreadProperties threadProperties;
+
+    /**
+     * 具体的线程池
+     */
     private final Executor executor;
     private volatile boolean interrupted;
 
     private final CountDownLatch threadLock = new CountDownLatch(1);
     private final Set<Runnable> shutdownHooks = new LinkedHashSet<Runnable>();
     private final boolean addTaskWakesUp;
+
+    /**
+     * 队列容量
+     */
     private final int maxPendingTasks;
+
+    /**
+     * 队列溢出后的处理方式
+     */
     private final RejectedExecutionHandler rejectedExecutionHandler;
 
     private long lastExecutionTime;

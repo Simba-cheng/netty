@@ -133,7 +133,10 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
 
         int maxMessagesPerWrite = maxMessagesPerWrite();
         while (maxMessagesPerWrite > 0) {
+
+            // 从 ChannelOutboundBuffer 中弹出一条消息进行处理
             Object msg = in.current();
+            // 如果消息为空,说明发送缓冲区为空,所有消息都已经被发送完成,退出循环。
             if (msg == null) {
                 break;
             }
