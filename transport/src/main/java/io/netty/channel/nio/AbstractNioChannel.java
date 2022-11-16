@@ -389,6 +389,10 @@ public abstract class AbstractNioChannel extends AbstractChannel {
         return loop instanceof NioEventLoop;
     }
 
+    /**
+     * MARK
+     * Channel 的注册
+     */
     @Override
     protected void doRegister() throws Exception {
 
@@ -398,14 +402,13 @@ public abstract class AbstractNioChannel extends AbstractChannel {
         for (;;) {
             try {
                 /*
-                    MARK
                     调用 SelectableChannel 的 register 方法，将当前 Channel 注册到 EventLoop 的多路复用器上
 
                     注册 Channel 的时候需要指定监听的网络操作位来表示 Channel 对哪几类网络事件感兴趣,定义如下:
-                        读 public static final int OP_READ = 1 << 0;
-                        写 public static final int OP_WRITE = 1 << 2;
-                        客户端连接 public static final int OP_CONNECT = 1 << 3;
-                        服务端连接 public static final int OP_ACCEPT = 1 << 4;
+                        读           public static final int OP_READ = 1 << 0;
+                        写           public static final int OP_WRITE = 1 << 2;
+                        客户端连接     public static final int OP_CONNECT = 1 << 3;
+                        服务端连接     public static final int OP_ACCEPT = 1 << 4;
 
                     此处注册的op是0,代表对任何事件都不感兴趣,仅为了完成注册操作。
 
@@ -416,6 +419,16 @@ public abstract class AbstractNioChannel extends AbstractChannel {
                 selectionKey = javaChannel().register(eventLoop().unwrappedSelector(), 0, this);
                 return;
             } catch (CancelledKeyException e) {
+                /*
+                    如果当前注册返回的 selectionKey 已经被取消，则抛出 CancelledKeyException 异常，捕获该异常进行处理。
+
+                    如果是第一次处理该异常，调用多路复用器的 selectNow() 方法将已经取消的 selectionKey 从多路复用器中删除掉。
+                    操作成功之后，将 selected 置为true,说明之前失效的 selectionKey 已经被删除掉。
+
+                    继续发起下一次注册操作，如果成功则退出，如果仍然发生 CancelledKeyException 异常，
+                    说明我们无法删除已经被取消的 selectionKey ,按照JDK的API说明，这种意外不应该发生。如果发生这种问题，
+                    则说明可能NIO的相关类库存在不可恢复的BUG,直接抛出 CancelledKeyException 异常到上层进行统一处理。
+                 */
                 if (!selected) {
                     // Force the Selector to select now as the "canceled" SelectionKey may still be
                     // cached and not removed because no Select.select(..) operation was called yet.
@@ -435,9 +448,21 @@ public abstract class AbstractNioChannel extends AbstractChannel {
         eventLoop().cancel(selectionKey());
     }
 
+    /**
+     * MARK
+     * 准备处理读操作之前需要设置网络操作位为读
+     */
     @Override
     protected void doBeginRead() throws Exception {
         // Channel.read() or ChannelHandlerContext.read() was called
+
+        /*
+            获取当前的SelectionKey进行判断，如果可用，说明Channel当前状态正常，则可以进行正常的操作位修改。
+
+            将 SelectionKey 当前的操作位与读操作位进行按位与操作，
+            如果等于O,说明目前并没有设置读操作位，通过 interestOps | readInterestOp 设置读操作位，
+            最后调用 selectionKey 的 interestOps 方法重新设置通道的网络操作位，这样就可以监听网络的读事件了。
+         */
         final SelectionKey selectionKey = this.selectionKey;
         if (!selectionKey.isValid()) {
             return;
