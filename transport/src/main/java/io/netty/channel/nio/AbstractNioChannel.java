@@ -391,16 +391,27 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 
     @Override
     protected void doRegister() throws Exception {
+
+        // 表示注册操作是否成功
         boolean selected = false;
+
         for (;;) {
             try {
                 /*
-                    MARK 调用NIO
+                    MARK
+                    调用 SelectableChannel 的 register 方法，将当前 Channel 注册到 EventLoop 的多路复用器上
 
-                    将当前 channel 注册到 selector上(nioEventLoop 中绑定的 selector)
+                    注册 Channel 的时候需要指定监听的网络操作位来表示 Channel 对哪几类网络事件感兴趣,定义如下:
+                        读 public static final int OP_READ = 1 << 0;
+                        写 public static final int OP_WRITE = 1 << 2;
+                        客户端连接 public static final int OP_CONNECT = 1 << 3;
+                        服务端连接 public static final int OP_ACCEPT = 1 << 4;
 
-                    ops=0: 当前感兴趣的事件是0,并未开始接收链接
-                    attr=this:
+                    此处注册的op是0,代表对任何事件都不感兴趣,仅为了完成注册操作。
+
+                    注册时可以指定附件，后续 Channel 接收到网络事件通知时可以从 SelectionKey 中重新获取之前的附件进行处理。
+                    此处将 AbstractNioChannel 的实现子类自身作为附件进行注册,如果注册 Channel 成功,则返回 selectionKey,
+                    通过 selectionKey 可以从多路复用器中获取 Channel 对象。
                  */
                 selectionKey = javaChannel().register(eventLoop().unwrappedSelector(), 0, this);
                 return;
