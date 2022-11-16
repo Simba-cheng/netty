@@ -60,8 +60,13 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
      * parentGroup 用于监听客户端连接,专门负责与客户端创建连接
      */
     volatile EventLoopGroup group;
+
+    /**
+     * 由 serverBootstrap.channel 方法设置
+     */
     @SuppressWarnings("deprecation")
     private volatile ChannelFactory<? extends C> channelFactory;
+
     private volatile SocketAddress localAddress;
 
     // The order in which ChannelOptions are applied is important they may depend on each other for validation

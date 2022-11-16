@@ -89,6 +89,7 @@ public abstract class SingleThreadEventLoop extends SingleThreadEventExecutor im
         /*
             如果从 ServerBootstrap#childGroup.register(child) 方法而来,是已建立的连接
 
+            MARK
             如果从 AbstractBootstrap#initAndRegister#config().group().register 方法而来,
             是用于注册 parentGroup 中的 NioServerSocketChannel,由 serverBootstrap.channel 方法设置
          */
@@ -106,6 +107,7 @@ public abstract class SingleThreadEventLoop extends SingleThreadEventExecutor im
         /*
             如果从 ServerBootstrap#childGroup.register(child) 方法而来,是已建立的连接
 
+            MARK
             如果从 AbstractBootstrap#initAndRegister#config().group().register 方法而来,
             是用于注册 parentGroup 中的 NioServerSocketChannel,由 serverBootstrap.channel 方法设置
 
