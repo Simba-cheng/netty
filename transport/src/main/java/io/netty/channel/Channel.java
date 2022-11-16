@@ -78,6 +78,8 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
 
     /**
      * Returns the globally unique identifier of this {@link Channel}.
+     * <p>
+     * 获取 Channel 的唯一标识
      */
     ChannelId id();
 
@@ -240,6 +242,10 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      *   <li>{@link #deregister(ChannelPromise)}</li>
      *   <li>{@link #voidPromise()}</li>
      * </ul>
+     *
+     * Unsafe接口实际上是Channel接口的辅助接口，它不应该被用户代码直接调用。
+     * 实际的I/O读写操作都是由Unsafe接口负责完成的。
+     *
      */
     interface Unsafe {
 

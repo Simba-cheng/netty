@@ -44,15 +44,35 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
 
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(AbstractChannel.class);
 
+    /**
+     * 父 Channel
+     */
     private final Channel parent;
+
+    /**
+     * Channel 的全局唯一ID
+     */
     private final ChannelId id;
+
+    /**
+     * Unsafe接口实际上是Channel接口的辅助接口，它不应该被用户代码直接调用。
+     * 实际的I/O读写操作都是由Unsafe接口负责完成的。
+     */
     private final Unsafe unsafe;
+
+    /**
+     * 当前 Channel 对应的 DefaultChannelPipeline
+     */
     private final DefaultChannelPipeline pipeline;
     private final VoidChannelPromise unsafeVoidPromise = new VoidChannelPromise(this, false);
     private final CloseFuture closeFuture = new CloseFuture(this);
 
     private volatile SocketAddress localAddress;
     private volatile SocketAddress remoteAddress;
+
+    /**
+     * 当前 Channel 注册的 EventLoop
+     */
     private volatile EventLoop eventLoop;
     private volatile boolean registered;
     private boolean closeInitiated;

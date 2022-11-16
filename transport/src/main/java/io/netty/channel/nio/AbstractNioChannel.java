@@ -44,14 +44,31 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Abstract base class for {@link Channel} implementations which use a Selector based approach.
+ * <p>
+ * Channel 实现的抽象基类，使用基于 Selector(选择器) 的方法。
  */
 public abstract class AbstractNioChannel extends AbstractChannel {
 
     private static final InternalLogger logger =
             InternalLoggerFactory.getInstance(AbstractNioChannel.class);
 
+    /**
+     * 由于 NIO Channel、NioSocketChannel 和 NioServerSocketChannel 需要共用，
+     * 所以定义了一个 java.nio.SocketChannel 和 java.nio.ServerSocketChannel 的公共父类 SelectableChannel,
+     * 用于设置 SelectableChannel 参数和进行I/O操作。
+     */
     private final SelectableChannel ch;
+
+    /**
+     * 它代表了 JDK SelectionKey 的 OP_READ
+     */
     protected final int readInterestOp;
+
+    /**
+     * 该 SelectionKey 是 Channel 注册到 EventLoop 后返回的选择键。
+     * 由于 Channel 会面临多个业务线程的并发写操作，当 SelectionKey 由 SelectionKey 修改之后，为了能让其他业务线程感知到变化，所以需要使
+     * 用 volatile 保证修改的可见性
+     */
     volatile SelectionKey selectionKey;
     boolean readPending;
     private final Runnable clearReadPendingRunnable = new Runnable() {
