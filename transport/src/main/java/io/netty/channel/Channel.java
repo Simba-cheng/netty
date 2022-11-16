@@ -108,6 +108,8 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
 
     /**
      * Returns the configuration of this channel.
+     *
+     * 获取当前 Channel 的配置信息，如 CONNECT_TIMEOUT_MILLIS
      */
     ChannelConfig config();
 
@@ -149,6 +151,8 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      * {@link SocketAddress} is supposed to be down-cast into more concrete
      * type such as {@link InetSocketAddress} to retrieve the detailed
      * information.
+     * <p>
+     * 当前 Channel 的本地绑定地址
      *
      * @return the local address of this channel.
      *         {@code null} if this channel is not bound.
@@ -160,7 +164,7 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      * returned {@link SocketAddress} is supposed to be down-cast into more
      * concrete type such as {@link InetSocketAddress} to retrieve the detailed
      * information.
-     *
+     * <p>
      * 获取当前 Channel 通信的远程 socket 地址
      *
      * @return the remote address of this channel.
@@ -227,6 +231,9 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
     @Override
     Channel read();
 
+    /**
+     * 将之前写入到发送环形数组中的消息全部写入到目标Chanel中，发送给通信对方
+     */
     @Override
     Channel flush();
 
