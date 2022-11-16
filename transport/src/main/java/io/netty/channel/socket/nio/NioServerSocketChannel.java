@@ -64,6 +64,8 @@ public class NioServerSocketChannel extends AbstractNioMessageChannel
         try {
             ServerSocketChannel channel =
                     SelectorProviderUtil.newChannel(OPEN_SERVER_SOCKET_CHANNEL_WITH_FAMILY, provider, family);
+
+            // 获取的是 java.nio.channels.ServerSocketChannel 实例
             return channel == null ? provider.openServerSocketChannel() : channel;
         } catch (IOException e) {
             throw new ChannelException("Failed to open a socket.", e);
@@ -100,7 +102,9 @@ public class NioServerSocketChannel extends AbstractNioMessageChannel
      * Create a new instance using the given {@link ServerSocketChannel}.
      */
     public NioServerSocketChannel(ServerSocketChannel channel) {
+        // 在父类中完成了 非阻塞IO的配置，及事件的注册
         super(null, channel, SelectionKey.OP_ACCEPT);
+
         config = new NioServerSocketChannelConfig(this, javaChannel().socket());
     }
 
@@ -156,8 +160,12 @@ public class NioServerSocketChannel extends AbstractNioMessageChannel
         javaChannel().close();
     }
 
+    /**
+     * 对 NioServerSocketChannel 来说，它的读取操作就是接收客户端的连接，创建 NioSocketChannel对象
+     */
     @Override
     protected int doReadMessages(List<Object> buf) throws Exception {
+        // 首先通过 ServerSocketChannel 的 accept()方法 接收新的客户端连接，获取 java.nio.channels.SocketChannel 对象
         SocketChannel ch = SocketUtils.accept(javaChannel());
 
         try {
