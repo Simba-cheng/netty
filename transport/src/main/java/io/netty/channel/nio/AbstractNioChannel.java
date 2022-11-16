@@ -46,6 +46,8 @@ import java.util.concurrent.TimeUnit;
  * Abstract base class for {@link Channel} implementations which use a Selector based approach.
  * <p>
  * Channel 实现的抽象基类，使用基于 Selector(选择器) 的方法。
+ * <p>
+ * 注意: AbstractNioChannel 是 NioSocketChannel 和 NioServerSocketChannel 的公共父类
  */
 public abstract class AbstractNioChannel extends AbstractChannel {
 
@@ -53,7 +55,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
             InternalLoggerFactory.getInstance(AbstractNioChannel.class);
 
     /**
-     * 由于 NIO Channel、NioSocketChannel 和 NioServerSocketChannel 需要共用，
+     * AbstractNioChannel 是 NioSocketChannel 和 NioServerSocketChannel 的公共父类,
      * 所以定义了一个 java.nio.SocketChannel 和 java.nio.ServerSocketChannel 的公共父类 SelectableChannel,
      * 用于设置 SelectableChannel 参数和进行I/O操作。
      */
@@ -390,7 +392,6 @@ public abstract class AbstractNioChannel extends AbstractChannel {
     }
 
     /**
-     * MARK
      * Channel 的注册
      */
     @Override

@@ -67,13 +67,24 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
     private final VoidChannelPromise unsafeVoidPromise = new VoidChannelPromise(this, false);
     private final CloseFuture closeFuture = new CloseFuture(this);
 
+    /**
+     * 本地地址
+     */
     private volatile SocketAddress localAddress;
+
+    /**
+     * 获取当前 Channel 通信的远程 socket 地址
+     */
     private volatile SocketAddress remoteAddress;
 
     /**
      * 当前 Channel 注册的 EventLoop
      */
     private volatile EventLoop eventLoop;
+
+    /**
+     * 是否已注册
+     */
     private volatile boolean registered;
     private boolean closeInitiated;
     private Throwable initialCloseCause;
@@ -239,6 +250,12 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
         return registered;
     }
 
+    /**
+     * Channel 会将 网络IO操作 触发到 ChannelPipeline 对应的事件方法。
+     * Netty 基于事件驱动，我们也可以理解为当 Channel 进行 IO操作 时会产生对应的IO 事件，
+     * 然后驱动事件在 ChannelPipeline 中传播，由对应的 ChannelHandler 对事件进行拦截和处理，
+     * 不关心的事件可以直接忽略
+     */
     @Override
     public ChannelFuture bind(SocketAddress localAddress) {
         return pipeline.bind(localAddress);
