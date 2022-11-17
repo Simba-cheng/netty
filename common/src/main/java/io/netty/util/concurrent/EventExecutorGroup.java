@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * {@link EventExecutorGroup} 负责通过其next()方法提供要使用的 {@link EventExecutor}。
  * <p>
- * 除此之外，它还负责处理它们的生命周期，并允许以全局方式关闭它们。
+ * 除此之外,它还负责处理它们的生命周期,并允许以全局方式关闭它们。
  * <p>
  * The {@link EventExecutorGroup} is responsible for providing the {@link EventExecutor}'s to use
  * via its {@link #next()} method. Besides this, it is also responsible for handling their

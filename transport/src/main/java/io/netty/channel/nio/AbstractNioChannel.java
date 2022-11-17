@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Abstract base class for {@link Channel} implementations which use a Selector based approach.
  * <p>
- * Channel 实现的抽象基类，使用基于 Selector(选择器) 的方法。
+ * Channel 实现的抽象基类,使用基于 Selector(选择器) 的方法。
  * <p>
  * 注意: AbstractNioChannel 是 NioSocketChannel 和 NioServerSocketChannel 的公共父类
  */
@@ -68,7 +68,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 
     /**
      * 该 SelectionKey 是 Channel 注册到 EventLoop 后返回的选择键。
-     * 由于 Channel 会面临多个业务线程的并发写操作，当 SelectionKey 由 SelectionKey 修改之后，为了能让其他业务线程感知到变化，所以需要使
+     * 由于 Channel 会面临多个业务线程的并发写操作,当 SelectionKey 由 SelectionKey 修改之后,为了能让其他业务线程感知到变化,所以需要使
      * 用 volatile 保证修改的可见性
      */
     volatile SelectionKey selectionKey;
@@ -403,7 +403,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
         for (;;) {
             try {
                 /*
-                    调用 SelectableChannel 的 register 方法，将当前 Channel 注册到 EventLoop 的多路复用器上
+                    调用 SelectableChannel 的 register 方法,将当前 Channel 注册到 EventLoop 的多路复用器上
 
                     注册 Channel 的时候需要指定监听的网络操作位来表示 Channel 对哪几类网络事件感兴趣,定义如下:
                         读           public static final int OP_READ = 1 << 0;
@@ -413,7 +413,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 
                     此处注册的op是0,代表对任何事件都不感兴趣,仅为了完成注册操作。
 
-                    注册时可以指定附件，后续 Channel 接收到网络事件通知时可以从 SelectionKey 中重新获取之前的附件进行处理。
+                    注册时可以指定附件,后续 Channel 接收到网络事件通知时可以从 SelectionKey 中重新获取之前的附件进行处理。
                     此处将 AbstractNioChannel 的实现子类自身作为附件进行注册,如果注册 Channel 成功,则返回 selectionKey,
                     通过 selectionKey 可以从多路复用器中获取 Channel 对象。
                  */
@@ -421,13 +421,13 @@ public abstract class AbstractNioChannel extends AbstractChannel {
                 return;
             } catch (CancelledKeyException e) {
                 /*
-                    如果当前注册返回的 selectionKey 已经被取消，则抛出 CancelledKeyException 异常，捕获该异常进行处理。
+                    如果当前注册返回的 selectionKey 已经被取消,则抛出 CancelledKeyException 异常,捕获该异常进行处理。
 
-                    如果是第一次处理该异常，调用多路复用器的 selectNow() 方法将已经取消的 selectionKey 从多路复用器中删除掉。
-                    操作成功之后，将 selected 置为true,说明之前失效的 selectionKey 已经被删除掉。
+                    如果是第一次处理该异常,调用多路复用器的 selectNow() 方法将已经取消的 selectionKey 从多路复用器中删除掉。
+                    操作成功之后,将 selected 置为true,说明之前失效的 selectionKey 已经被删除掉。
 
-                    继续发起下一次注册操作，如果成功则退出，如果仍然发生 CancelledKeyException 异常，
-                    说明我们无法删除已经被取消的 selectionKey ,按照JDK的API说明，这种意外不应该发生。如果发生这种问题，
+                    继续发起下一次注册操作,如果成功则退出,如果仍然发生 CancelledKeyException 异常,
+                    说明我们无法删除已经被取消的 selectionKey ,按照JDK的API说明,这种意外不应该发生。如果发生这种问题,
                     则说明可能NIO的相关类库存在不可恢复的BUG,直接抛出 CancelledKeyException 异常到上层进行统一处理。
                  */
                 if (!selected) {
@@ -458,11 +458,11 @@ public abstract class AbstractNioChannel extends AbstractChannel {
         // Channel.read() or ChannelHandlerContext.read() was called
 
         /*
-            获取当前的SelectionKey进行判断，如果可用，说明Channel当前状态正常，则可以进行正常的操作位修改。
+            获取当前的SelectionKey进行判断,如果可用,说明Channel当前状态正常,则可以进行正常的操作位修改。
 
-            将 SelectionKey 当前的操作位与读操作位进行按位与操作，
-            如果等于O,说明目前并没有设置读操作位，通过 interestOps | readInterestOp 设置读操作位，
-            最后调用 selectionKey 的 interestOps 方法重新设置通道的网络操作位，这样就可以监听网络的读事件了。
+            将 SelectionKey 当前的操作位与读操作位进行按位与操作,
+            如果等于O,说明目前并没有设置读操作位,通过 interestOps | readInterestOp 设置读操作位,
+            最后调用 selectionKey 的 interestOps 方法重新设置通道的网络操作位,这样就可以监听网络的读事件了。
          */
         final SelectionKey selectionKey = this.selectionKey;
         if (!selectionKey.isValid()) {

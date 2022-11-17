@@ -51,7 +51,7 @@ public class NioServerSocketChannel extends AbstractNioMessageChannel
     private static final ChannelMetadata METADATA = new ChannelMetadata(false, 16);
 
     /**
-     * java.nio 包中的内容，用于获取 java.nio.channels.ServerSocketChannel 实例
+     * java.nio 包中的内容,用于获取 java.nio.channels.ServerSocketChannel 实例
      */
     private static final SelectorProvider DEFAULT_SELECTOR_PROVIDER = SelectorProvider.provider();
 
@@ -102,7 +102,7 @@ public class NioServerSocketChannel extends AbstractNioMessageChannel
      * Create a new instance using the given {@link ServerSocketChannel}.
      */
     public NioServerSocketChannel(ServerSocketChannel channel) {
-        // 在父类中完成了 非阻塞IO的配置，及事件的注册
+        // 在父类中完成了 非阻塞IO的配置,及事件的注册
         super(null, channel, SelectionKey.OP_ACCEPT);
 
         config = new NioServerSocketChannelConfig(this, javaChannel().socket());
@@ -161,16 +161,16 @@ public class NioServerSocketChannel extends AbstractNioMessageChannel
     }
 
     /**
-     * 对 NioServerSocketChannel 来说，它的读取操作就是接收客户端的连接，创建 NioSocketChannel 对象
+     * 对 NioServerSocketChannel 来说,它的读取操作就是接收客户端的连接,创建 NioSocketChannel 对象
      */
     @Override
     protected int doReadMessages(List<Object> buf) throws Exception {
-        // 首先通过 ServerSocketChannel 的 accept()方法 接收新的客户端连接，获取 java.nio.channels.SocketChannel 对象
+        // 首先通过 ServerSocketChannel 的 accept()方法 接收新的客户端连接,获取 java.nio.channels.SocketChannel 对象
         SocketChannel ch = SocketUtils.accept(javaChannel());
 
         try {
-            // 如果获取到客户端连接对象 java.nio.channels.SocketChannel，则利用当前的 NioServerSocketChannel、EventLoop
-            // 和 SocketChannel 创建新的 NioSocketChannel，并添加到 buf 中
+            // 如果获取到客户端连接对象 java.nio.channels.SocketChannel,则利用当前的 NioServerSocketChannel、EventLoop
+            // 和 SocketChannel 创建新的 NioSocketChannel,并添加到 buf 中
             if (ch != null) {
                 buf.add(new NioSocketChannel(this, ch));
                 return 1;

@@ -76,10 +76,10 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
     @Override
     public ServerBootstrap group(EventLoopGroup group) {
         /*
-            如果只使用一个线程池，即 parentGroup 和 childGroup 是同一个线程池,
+            如果只使用一个线程池,即 parentGroup 和 childGroup 是同一个线程池,
             '主从reactor-多线程模型' 退化为-> '单reactor-单线程模型' or '单reactor-多线程模型'
 
-            具体是 '单reactor-单线程模型' 还是 '单reactor-多线程模型'，要看构造EventLoopGroup时的配置。
+            具体是 '单reactor-单线程模型' 还是 '单reactor-多线程模型',要看构造EventLoopGroup时的配置。
          */
         return group(group, group);
     }
@@ -177,7 +177,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
             装配 pipeline 流水线
 
             ChannelInitializer 一次性、初始化handler
-                它会添加 ServerBootstrapAcceptor handler，添加完成后自己就移除了。
+                它会添加 ServerBootstrapAcceptor handler,添加完成后自己就移除了。
                 ServerBootstrapAcceptor handler 负责与客户端建立连接
          */
         p.addLast(new ChannelInitializer<Channel>() {
@@ -292,7 +292,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
 
                     childGroup: 用于处理每一个已建立连接发生的I/O读写事件的线程池
 
-                    childGroup 是如何从内部取出一个 child(eventLoop)，与已建立链接的 socketChannel 绑定的?
+                    childGroup 是如何从内部取出一个 child(eventLoop),与已建立链接的 socketChannel 绑定的?
                         其内部使用选择器(chooser),用于选择一个内部的 EventLoop.
                         源码位于: io.netty.util.concurrent.MultithreadEventExecutorGroup.next
                  */
@@ -337,7 +337,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
     }
 
     /**
-     * 返回已配置的 {@link EventLoopGroup}，该 EventLoopGroup 将用于子通道，如果未配置则返回null。
+     * 返回已配置的 {@link EventLoopGroup},该 EventLoopGroup 将用于子通道,如果未配置则返回null。
      * <p>
      * 注意: 此方法已弃用,使用 {@link #config()} 方法
      * <p>

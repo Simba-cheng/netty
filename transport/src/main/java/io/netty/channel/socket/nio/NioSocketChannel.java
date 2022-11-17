@@ -58,6 +58,10 @@ import static io.netty.channel.internal.ChannelUtils.MAX_BYTES_PER_GATHERING_WRI
  */
 public class NioSocketChannel extends AbstractNioByteChannel implements io.netty.channel.socket.SocketChannel {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(NioSocketChannel.class);
+
+    /**
+     * 与 NioServerSocketChannel 一样,这里也依赖了 java.nio 包中的API
+     */
     private static final SelectorProvider DEFAULT_SELECTOR_PROVIDER = SelectorProvider.provider();
 
     private static final Method OPEN_SOCKET_CHANNEL_WITH_FAMILY =
@@ -65,6 +69,9 @@ public class NioSocketChannel extends AbstractNioByteChannel implements io.netty
 
     private final SocketChannelConfig config;
 
+    /**
+     * 从这里可以看出,NioSocketChannel 对 java.nio.channels.SocketChannel 做了进一步封装,使其 适用于 Netty框架
+     */
     private static SocketChannel newChannel(SelectorProvider provider, InternetProtocolFamily family) {
         try {
             SocketChannel channel = SelectorProviderUtil.newChannel(OPEN_SOCKET_CHANNEL_WITH_FAMILY, provider, family);

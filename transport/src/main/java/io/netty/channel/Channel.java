@@ -88,9 +88,9 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      * <p>
      * 获取到 Channel 注册的 EventLoop.
      * <pre>
-     * Channel 需要注册到 EventLoop 的多路复用器上，用于处理I/O事件，
+     * Channel 需要注册到 EventLoop 的多路复用器上,用于处理I/O事件,
      * EventLoop 本质上就是处理网络读写事件的 Reactor 线程。
-     * 在Netty中，它不仅仅用来处理网络事件，也可以用来执行定时务和用户自定义NioTask等任务。
+     * 在Netty中,它不仅仅用来处理网络事件,也可以用来执行定时务和用户自定义NioTask等任务。
      * </pre>
      */
     EventLoop eventLoop();
@@ -98,7 +98,7 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
     /**
      * Returns the parent of this channel.
      * <p>
-     * 对于服务端 Channel 而言，它的父Channel为空；
+     * 对于服务端 Channel 而言,它的父Channel为空；
      * 对于客户端 Channel ,它的 父Channel 就是创建它的 ServerSocketChannel。
      *
      * @return the parent channel.
@@ -109,7 +109,7 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
     /**
      * Returns the configuration of this channel.
      *
-     * 获取当前 Channel 的配置信息，如 CONNECT_TIMEOUT_MILLIS
+     * 获取当前 Channel 的配置信息,如 CONNECT_TIMEOUT_MILLIS
      */
     ChannelConfig config();
 
@@ -139,9 +139,9 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      * <p>
      * 获取当前 Channel 的 TCP 参数配置
      * <pre>
-     * 当创建 Socket 的时候需要指定 TCP 参数，例如: 接收和发送的TCP缓冲区大小，TCP的超时时间，是否重用地址等等。
-     * 在Netty中，每个 Channel 对应一个物理连接，每个连接都有自己的 TCP 参数配置。
-     * 所以，Channel 会聚合一个 ChannelMetadata 用来对 TCP 参数提供元数据描述信息。
+     * 当创建 Socket 的时候需要指定 TCP 参数,例如: 接收和发送的TCP缓冲区大小,TCP的超时时间,是否重用地址等等。
+     * 在Netty中,每个 Channel 对应一个物理连接,每个连接都有自己的 TCP 参数配置。
+     * 所以,Channel 会聚合一个 ChannelMetadata 用来对 TCP 参数提供元数据描述信息。
      * </pre>
      */
     ChannelMetadata metadata();
@@ -221,18 +221,18 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
     /**
      * 从当前的 Channel 中读取数据到第一个 inbound 缓冲区中;
      * <pre>
-     * 如果数据被成功读取，触发 ChannelHandler.channelRead(ChannelHandlerContext,Object) 事件
+     * 如果数据被成功读取,触发 ChannelHandler.channelRead(ChannelHandlerContext,Object) 事件
      *
-     * 读取操作API调用完成之后，紧接着会触发 ChannelHandler.channelReadComplete(ChannelHandlerContext) 事件，
+     * 读取操作API调用完成之后,紧接着会触发 ChannelHandler.channelReadComplete(ChannelHandlerContext) 事件,
      * 这样业务的 ChannelHandler 可以决定是否需要继续读取数据。
-     * 如果已经有读操作请求被挂起，则后续的读操作会被忽略。
+     * 如果已经有读操作请求被挂起,则后续的读操作会被忽略。
      * </pre>
      */
     @Override
     Channel read();
 
     /**
-     * 将之前写入到发送环形数组中的消息全部写入到目标Chanel中，发送给通信对方
+     * 将之前写入到发送环形数组中的消息全部写入到目标Chanel中,发送给通信对方
      */
     @Override
     Channel flush();
@@ -250,7 +250,7 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      *   <li>{@link #voidPromise()}</li>
      * </ul>
      *
-     * Unsafe接口实际上是Channel接口的辅助接口，它不应该被用户代码直接调用。
+     * Unsafe接口实际上是Channel接口的辅助接口,它不应该被用户代码直接调用。
      * 实际的I/O读写操作都是由Unsafe接口负责完成的。
      *
      */

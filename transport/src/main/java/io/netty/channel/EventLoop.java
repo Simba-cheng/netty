@@ -18,7 +18,7 @@ package io.netty.channel;
 import io.netty.util.concurrent.OrderedEventExecutor;
 
 /**
- * 注册后，将处理 {@link Channel} 的所有I/O操作。一个 {@link EventLoop} 实例通常将处理多个 {@link Channel}，但这可能取决于实现细节和内部结构。
+ * 注册后,将处理 {@link Channel} 的所有I/O操作。一个 {@link EventLoop} 实例通常将处理多个 {@link Channel},但这可能取决于实现细节和内部结构。
  * <p>
  * Will handle all the I/O operations for a {@link Channel} once registered.
  * <p>

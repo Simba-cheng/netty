@@ -33,7 +33,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * {@link MultithreadEventLoopGroup} 的实现，用于基于NIO选择器的通道。
+ * {@link MultithreadEventLoopGroup} 的实现,用于基于NIO选择器的通道。
  * <p>
  * {@link MultithreadEventLoopGroup} implementations which is used for NIO {@link Selector} based {@link Channel}s.
  */
@@ -124,11 +124,11 @@ public class NioEventLoopGroup extends MultithreadEventLoopGroup {
      * @param selectorProvider         NIO工具类
      *                                 SelectorProvider使用了JDK的 SPI机制 来创建Selector、ServerSocketChannel、SocketChannel 等对象；
      * @param selectStrategyFactory    用来创建 SelectStrategy 的工厂
-     *                                 SelectStrategy 是 Netty 用来控制 eventLoop 轮询方式的策略，默认为 DefaultSelectStrategy；
+     *                                 SelectStrategy 是 Netty 用来控制 eventLoop 轮询方式的策略,默认为 DefaultSelectStrategy；
      * @param rejectedExecutionHandler 线程池的任务拒绝策略
      *                                 默认是抛出 RejectedExecutionException 异常；
-     * @param taskQueueFactory         任务队列工厂类，每一个EventLoop对象内部都会包含一个任务队列
-     *                                 这个工厂类就是用来创建队列的，默认会创建一个Netty自定义线程安全的 MpscUnboundedArrayQueue 无锁队列。
+     * @param taskQueueFactory         任务队列工厂类,每一个EventLoop对象内部都会包含一个任务队列
+     *                                 这个工厂类就是用来创建队列的,默认会创建一个Netty自定义线程安全的 MpscUnboundedArrayQueue 无锁队列。
      */
     public NioEventLoopGroup(int nThreads, Executor executor, EventExecutorChooserFactory chooserFactory,
                              final SelectorProvider selectorProvider,
@@ -191,14 +191,14 @@ public class NioEventLoopGroup extends MultithreadEventLoopGroup {
         // NIO工具类,SelectorProvider 使用了JDK的 SPI机制 来创建Selector、ServerSocketChannel、SocketChannel 等对象；
         SelectorProvider selectorProvider = (SelectorProvider) args[0];
 
-        // SelectStrategy 是 Netty 用来控制 eventLoop 轮询方式的策略，此处 args[0] = DefaultSelectStrategyFactory.INSTANCE；
+        // SelectStrategy 是 Netty 用来控制 eventLoop 轮询方式的策略,此处 args[0] = DefaultSelectStrategyFactory.INSTANCE；
         SelectStrategyFactory selectStrategyFactory = (SelectStrategyFactory) args[1];
 
         // 线程池的任务拒绝策略,默认是抛出 RejectedExecutionException 异常；
         RejectedExecutionHandler rejectedExecutionHandler = (RejectedExecutionHandler) args[2];
 
-        // 任务队列工厂类，每一个EventLoop对象内部都会包含一个任务队列
-        // 这个工厂类就是用来创建队列的，默认会创建一个Netty自定义线程安全的 MpscUnboundedArrayQueue 无锁队列。
+        // 任务队列工厂类,每一个EventLoop对象内部都会包含一个任务队列
+        // 这个工厂类就是用来创建队列的,默认会创建一个Netty自定义线程安全的 MpscUnboundedArrayQueue 无锁队列。
         EventLoopTaskQueueFactory taskQueueFactory = null;
 
         EventLoopTaskQueueFactory tailTaskQueueFactory = null;

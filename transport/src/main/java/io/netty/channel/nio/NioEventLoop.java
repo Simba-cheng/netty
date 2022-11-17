@@ -51,7 +51,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * {@link SingleThreadEventLoop} 实现，它将 {@link Channel} 注册到 {@link Selector}，并且在事件循环中对这些通道进行多路复用。
+ * {@link SingleThreadEventLoop} 实现,它将 {@link Channel} 注册到 {@link Selector},并且在事件循环中对这些通道进行多路复用。
  * <p>
  * {@link SingleThreadEventLoop} implementation which register the {@link Channel}'s to a
  * {@link Selector} and so does the multi-plexing of these in the event loop.

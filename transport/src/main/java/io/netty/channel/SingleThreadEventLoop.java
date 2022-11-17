@@ -29,7 +29,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * {@link EventLoop} 的抽象基类，它在一个线程中执行所有提交的任务。
+ * {@link EventLoop} 的抽象基类,它在一个线程中执行所有提交的任务。
  * <p>
  * Abstract base class for {@link EventLoop}s that execute all its submitted tasks in a single thread.
  */

@@ -55,7 +55,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
     private final ChannelId id;
 
     /**
-     * Unsafe接口实际上是Channel接口的辅助接口，它不应该被用户代码直接调用。
+     * Unsafe接口实际上是Channel接口的辅助接口,它不应该被用户代码直接调用。
      * 实际的I/O读写操作都是由Unsafe接口负责完成的。
      */
     private final Unsafe unsafe;
@@ -252,8 +252,8 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
 
     /**
      * Channel 会将 网络IO操作 触发到 ChannelPipeline 对应的事件方法。
-     * Netty 基于事件驱动，我们也可以理解为当 Channel 进行 IO操作 时会产生对应的IO 事件，
-     * 然后驱动事件在 ChannelPipeline 中传播，由对应的 ChannelHandler 对事件进行拦截和处理，
+     * Netty 基于事件驱动,我们也可以理解为当 Channel 进行 IO操作 时会产生对应的IO 事件,
+     * 然后驱动事件在 ChannelPipeline 中传播,由对应的 ChannelHandler 对事件进行拦截和处理,
      * 不关心的事件可以直接忽略
      */
     @Override

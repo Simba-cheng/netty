@@ -47,7 +47,7 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 /**
  * Abstract base class for {@link OrderedEventExecutor}'s that execute all its submitted tasks in a single thread.
  * <p>
- * NioEventLoop 是基于 SingleThreadEventExecutor 而实现的，非IO相关的功能全部在 SingleThreadEventExecutor 中。
+ * NioEventLoop 是基于 SingleThreadEventExecutor 而实现的,非IO相关的功能全部在 SingleThreadEventExecutor 中。
  *
  * 在单个线程中执行所有提交的任务
  */
