@@ -115,11 +115,16 @@ public final class NioEventLoop extends SingleThreadEventLoop {
 
     /**
      * The NIO {@link Selector}.
+     * <p>
+     * 作为 NIO框架 的 Reactor线程，NioEventLoop 需要处理 网络I/O读写事件，因此它必须聚合一个多路复用器对象 Selector
      */
     private Selector selector;
     private Selector unwrappedSelector;
     private SelectedSelectionKeySet selectedKeys;
 
+    /**
+     * 通过 provider.open() 从操作系统底层获取 Selector实例
+     */
     private final SelectorProvider provider;
 
     private static final long AWAKE = -1L;
@@ -652,6 +657,9 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         }
     }
 
+    /**
+     * 轮询 事件就绪的channel，进行 IO事件处理
+     */
     private void processSelectedKeys() {
         if (selectedKeys != null) {
             processSelectedKeysOptimized();
@@ -746,11 +754,17 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         }
     }
 
+    /**
+     * 轮询 事件就绪的channel，进行 IO事件处理
+     */
     private void processSelectedKey(SelectionKey k, AbstractNioChannel ch) {
+
+        // 获取 channel 的内部辅助类 Unsafe，通过 Unsafe 进行IO事件处理
         final AbstractNioChannel.NioUnsafe unsafe = ch.unsafe();
         if (!k.isValid()) {
             final EventLoop eventLoop;
             try {
+                // 获取要处理 channel 所绑定的 eventLoop线程，如果绑定的不是当前的 IO线程的事件，就不处理
                 eventLoop = ch.eventLoop();
             } catch (Throwable ignored) {
                 // If the channel implementation throws an exception because there is no event loop, we ignore this
