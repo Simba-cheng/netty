@@ -250,9 +250,9 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      *   <li>{@link #voidPromise()}</li>
      * </ul>
      *
+     * <b>实际的I/O读写操作都是由Unsafe接口负责完成的。</b>
+     * <p>
      * Unsafe接口实际上是Channel接口的辅助接口,它不应该被用户代码直接调用。
-     * 实际的I/O读写操作都是由Unsafe接口负责完成的。
-     *
      */
     interface Unsafe {
 
@@ -265,24 +265,32 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
         /**
          * Return the {@link SocketAddress} to which is bound local or
          * {@code null} if none.
+         * <p>
+         * 返回绑定的 本地地址
          */
         SocketAddress localAddress();
 
         /**
          * Return the {@link SocketAddress} to which is bound remote or
          * {@code null} if none is bound yet.
+         * <p>
+         * 返回绑定的 远程地址
          */
         SocketAddress remoteAddress();
 
         /**
          * Register the {@link Channel} of the {@link ChannelPromise} and notify
          * the {@link ChannelFuture} once the registration was complete.
+         * <p>
+         * 将 Channel 注册到 EventLoop 上
          */
         void register(EventLoop eventLoop, ChannelPromise promise);
 
         /**
          * Bind the {@link SocketAddress} to the {@link Channel} of the {@link ChannelPromise} and notify
          * it once its done.
+         * <p>
+         * 绑定 本地地址 到 Channel 上
          */
         void bind(SocketAddress localAddress, ChannelPromise promise);
 
@@ -290,20 +298,26 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
          * Connect the {@link Channel} of the given {@link ChannelFuture} with the given remote {@link SocketAddress}.
          * If a specific local {@link SocketAddress} should be used it need to be given as argument. Otherwise just
          * pass {@code null} to it.
-         *
+         * <p>
          * The {@link ChannelPromise} will get notified once the connect operation was complete.
+         * <p>
+         * 连接到远程服务器
          */
         void connect(SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise);
 
         /**
          * Disconnect the {@link Channel} of the {@link ChannelFuture} and notify the {@link ChannelPromise} once the
          * operation was complete.
+         * <p>
+         * 断开连接
          */
         void disconnect(ChannelPromise promise);
 
         /**
          * Close the {@link Channel} of the {@link ChannelPromise} and notify the {@link ChannelPromise} once the
          * operation was complete.
+         * <p>
+         * 关闭连接
          */
         void close(ChannelPromise promise);
 
@@ -322,16 +336,22 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
         /**
          * Schedules a read operation that fills the inbound buffer of the first {@link ChannelInboundHandler} in the
          * {@link ChannelPipeline}.  If there's already a pending read operation, this method does nothing.
+         * <p>
+         * 读就绪 网络事件
          */
         void beginRead();
 
         /**
          * Schedules a write operation.
+         * <p>
+         * 发送数据
          */
         void write(Object msg, ChannelPromise promise);
 
         /**
          * Flush out all write operations scheduled via {@link #write(Object, ChannelPromise)}.
+         * <p>
+         * 将缓冲区的数据 刷到 Channel
          */
         void flush();
 
