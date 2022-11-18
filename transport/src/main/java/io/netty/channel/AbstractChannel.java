@@ -499,6 +499,9 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
         }
 
         /**
+         * 将当前 Unsafe 对应的 Channel 注册到 EventLoop 的多路复用器上,然后调用 DefaultChannelPipeline 的 fireChannelRegistered()方法,
+         * 如果 Channel 被激活 则调用 DefaultChannelPipeline 的 fireChannelActive()方法.
+         *e
          * @param eventLoop parentGroup、childGroup
          * @param promise   包装过的channel
          *                  可能是 parentGroup 中的 NioServerSocketChannel,也可能是 childGroup 中已建立连接的 nioSocketChannel
@@ -588,6 +591,9 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             }
         }
 
+        /**
+         * 绑定指定的端口，对于服务端 用于绑定监听端口，对于客户端，主要用于指定 客户端Channel 的本地绑定Socket地址。
+         */
         @Override
         public final void bind(final SocketAddress localAddress, final ChannelPromise promise) {
             assertEventLoop();
@@ -630,6 +636,9 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             safeSetSuccess(promise);
         }
 
+        /**
+         * 客户端 或 服务端，主动关闭连接
+         */
         @Override
         public final void disconnect(final ChannelPromise promise) {
             assertEventLoop();
@@ -663,6 +672,10 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             closeIfClosed(); // doDisconnect() might have closed the channel
         }
 
+        /**
+         * 在链路关闭之前需要首先判断是否处于刷新状态，如果处于刷新状态说明还有消息尚未发送出去，
+         * 需要等到所有消息发送完成再关闭链路，因此，将关闭操作封装成Runnable稍后再执行
+         */
         @Override
         public void close(final ChannelPromise promise) {
             assertEventLoop();
@@ -895,6 +908,9 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             }
         }
 
+        /**
+         * 本方法实际上将消息添加到环形发送数组中，并不是真正的写Channel
+         */
         @Override
         public final void write(Object msg, ChannelPromise promise) {
             assertEventLoop();
@@ -934,6 +950,9 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             outboundBuffer.addMessage(msg, size, promise);
         }
 
+        /**
+         * 将缓冲区中待发送的消息全部写入 Channel，并发送给通信对方
+         */
         @Override
         public final void flush() {
             assertEventLoop();
