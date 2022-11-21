@@ -22,6 +22,7 @@ import io.netty.util.internal.ThreadExecutorMap;
 import io.netty.util.internal.UnstableApi;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+import org.jctools.queues.MpscUnboundedArrayQueue;
 import org.jetbrains.annotations.Async.Schedule;
 
 import java.lang.Thread.State;
@@ -98,7 +99,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
                     SingleThreadEventExecutor.class, ThreadProperties.class, "threadProperties");
 
     /**
-     * 阻塞任务队列 {@link LinkedBlockingQueue}
+     * 阻塞任务队列 {@link MpscUnboundedArrayQueue}
      */
     private final Queue<Runnable> taskQueue;
 
@@ -874,9 +875,13 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
     }
 
     private void execute(Runnable task, boolean immediate) {
+        // 判断当前执行线程是否为EventLoop内部的工作线程
         boolean inEventLoop = inEventLoop();
+        // 将任务添加到内部队列
         addTask(task);
+        // 如果不是 EventLoop 内部线程提交的task，则判断内部线程是否已经启动，没有则启动内部线程
         if (!inEventLoop) {
+            // 启动内部线程
             startThread();
             if (isShutdown()) {
                 boolean reject = false;
@@ -890,6 +895,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
                     // In worst case we will log on termination.
                 }
                 if (reject) {
+                    // 执行拒绝策略
                     reject();
                 }
             }
@@ -991,9 +997,11 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
 
     private void startThread() {
         if (state == ST_NOT_STARTED) {
+            // CAS操作，以非阻塞的线程安全方式更新
             if (STATE_UPDATER.compareAndSet(this, ST_NOT_STARTED, ST_STARTED)) {
                 boolean success = false;
                 try {
+                    // 启动内部线程
                     doStartThread();
                     success = true;
                 } finally {
@@ -1023,6 +1031,10 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
         return false;
     }
 
+    /**
+     * doStartThread 方法看起来很长，其实就是向 NioEventLoop 内部的 ThreadPerTaskExecutor 提交一个任务，
+     * ThreadPerTaskExecutor 会创建一个新线程来执行这个任务，这个线程就是 NioEventLoop 内部的工作线程：
+     */
     private void doStartThread() {
         assert thread == null;
         executor.execute(new Runnable() {
