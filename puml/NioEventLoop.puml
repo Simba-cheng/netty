@@ -2,11 +2,11 @@
 
 Actor -> NioEventLoop: 1 create
 
-NioEventLoop -> SingleThreadEventLoop: 2 调用父类构造器
+NioEventLoop -> NioEventLoop: \n 1.1 初始化 NioEventLoop 内部任务队列
+NioEventLoop -> SingleThreadEventLoop: \n 2 调用父类构造器
 SingleThreadEventLoop -> SingleThreadEventExecutor: 3 调用父类构造器
 SingleThreadEventExecutor -> xxxParent :4 调用父类构造器
-SingleThreadEventExecutor -> SingleThreadEventExecutor : 4.1 \n 初始化NioEventLoop内部任务队列
-SingleThreadEventExecutor -> SingleThreadEventExecutor : 4.2 \n 初始化其他参数
+SingleThreadEventExecutor -> SingleThreadEventExecutor : \n 4.1 初始化其他参数
 
 SingleThreadEventLoop <-- SingleThreadEventExecutor
 NioEventLoop <-- SingleThreadEventLoop
