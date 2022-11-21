@@ -527,7 +527,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                 register0(promise);
             } else {
                 try {
-                    // 重点
+                    // 重点: eventLoop.execute(...) 方法
                     eventLoop.execute(new Runnable() {
                         @Override
                         public void run() {
