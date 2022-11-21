@@ -1032,7 +1032,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
     }
 
     /**
-     * doStartThread 方法看起来很长，其实就是向 NioEventLoop 内部的 ThreadPerTaskExecutor 提交一个任务，
+     * doStartThread 方法看起来很长，其实就是向 NioEventLoop 内部的 ThreadPerTaskExecutor 提交一个线程(任务)，
      * ThreadPerTaskExecutor 会创建一个新线程来执行这个任务，这个线程就是 NioEventLoop 内部的工作线程：
      */
     private void doStartThread() {
