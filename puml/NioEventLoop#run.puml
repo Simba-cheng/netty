@@ -1,28 +1,23 @@
 @startuml participant
 
-Actor -> NioEventLoop: run
+SingleThreadEventExecutor -> NioEventLoop: run \n 即:this.run()
 
 ' ----- 分割线 -----
 loop 'for (;;)' 死循环
-NioEventLoop -> NioEventLoop: \n 1 检查 taskQueue 任务数
+    NioEventLoop -> NioEventLoop: \n 1 检查 taskQueue 任务数
 
-alt 没有任务
+    alt 没有任务
+        NioEventLoop -> NioEventLoop: \n 2 select(long deadlineNanos) \n    尝试轮询IO事件(就绪的channel) \n    可能会阻塞
+    else 有任务
+        NioEventLoop -> NioEventLoop: \n 3 processSelectedKeys
+        NioEventLoop -> NioEventLoop: \n 3.1 处理 OP_CONNECT 事件(建立连接事件)
+        NioEventLoop -> NioEventLoop: \n 3.2 处理 OP_WRITE 事件(写事件)
+        NioEventLoop -> NioEventLoop: \n 3.3 处理 OP_READ 事件(读事件)
 
-NioEventLoop -> NioEventLoop: \n 2 select(long deadlineNanos) \n    尝试轮询IO事件(就绪的channel) \n    可能会阻塞
-
-else 有任务
-
-NioEventLoop -> NioEventLoop: \n 3 processSelectedKeys
-NioEventLoop -> NioEventLoop: \n 3.1 处理 OP_CONNECT 事件(建立连接事件)
-NioEventLoop -> NioEventLoop: \n 3.2 处理 OP_WRITE 事件(写事件)
-NioEventLoop -> NioEventLoop: \n 3.3 处理 OP_READ 事件(读事件)
-
-NioEventLoop -> NioEventLoop: \n 4 runAllTasks
-
-end
-
+        NioEventLoop -> NioEventLoop: \n 4 runAllTasks
+    end
 end
 ' ----- 分割线 -----
 
-Actor <-- NioEventLoop
+SingleThreadEventExecutor <-- NioEventLoop
 @enduml

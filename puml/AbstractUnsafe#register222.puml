@@ -1,0 +1,50 @@
+@startuml participant
+
+Actor -> AbstractUnsafe: 1 register
+
+AbstractUnsafe -> SingleThreadEventExecutor: 2 execute(Runnable task) \n   普通调用栈(传参)
+SingleThreadEventExecutor -> SingleThreadEventExecutor: 2.1 execute0(Runnable task) \n      普通调用栈(传参)
+SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 2.2 execute(Runnable task, boolean immediate) \n       执行函数
+SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 2.2.1 addTask(task) \n          将task添加到内部队列 \n          taskQueue#MpscUnboundedArrayQueue
+SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 2.2.2 startThread \n          准备以线程安全启动工作线程
+
+SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 2.2.3 doStartThread
+
+' ----- 分割线 -----
+loop 向 ThreadPerTaskExecutor 线程池提交一个线程(任务),\n 这个线程就是真正的工作线程,
+SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 2.2.3.1 SingleThreadEventExecutor.this.run() \n             执行 NioEventLoop 实现的核心逻辑
+end
+' ----- 分割线 -----
+
+newpage NioEventLoop#run 方法 \n 即:SingleThreadEventExecutor.this.run()
+
+SingleThreadEventExecutor -> NioEventLoop: run
+
+' ----- 分割线 -----
+loop 'for (;;)' 死循环
+NioEventLoop -> NioEventLoop: \n 1 检查 taskQueue 任务数
+
+alt 没有任务
+
+NioEventLoop -> NioEventLoop: \n 2 select(long deadlineNanos) \n    尝试轮询IO事件(就绪的channel) \n    可能会阻塞
+
+else 有任务
+
+NioEventLoop -> NioEventLoop: \n 3 processSelectedKeys
+NioEventLoop -> NioEventLoop: \n 3.1 处理 OP_CONNECT 事件(建立连接事件)
+NioEventLoop -> NioEventLoop: \n 3.2 处理 OP_WRITE 事件(写事件)
+NioEventLoop -> NioEventLoop: \n 3.3 处理 OP_READ 事件(读事件)
+
+NioEventLoop -> NioEventLoop: \n 4 runAllTasks
+
+end
+
+end
+' ----- 分割线 -----
+
+SingleThreadEventExecutor <-- NioEventLoop: \n
+
+SingleThreadEventExecutor -> SingleThreadEventExecutor: \n x.x.x 其余逻辑暂略
+
+Actor <-- SingleThreadEventExecutor
+@enduml
