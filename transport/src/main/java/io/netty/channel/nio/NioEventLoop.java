@@ -522,8 +522,10 @@ public final class NioEventLoop extends SingleThreadEventLoop {
             try {
                 int strategy;
                 try {
-                    // select处理策略，用于控制select循环行为，包含 CONTINUE、SELECT、BUSY_WAIT 三种策略
-                    // Netty不支持 BUSY_WAIT，所以 BUSY_WAIT 与 SELECT 的执行逻辑是一样的
+                    /*
+                       select处理策略，用于控制select循环行为，包含 CONTINUE、SELECT、BUSY_WAIT 三种策略,Netty不支持 BUSY_WAIT，
+                       所以 BUSY_WAIT 与 SELECT 的执行逻辑是一样的。
+                     */
                     strategy = selectStrategy.calculateStrategy(selectNowSupplier, hasTasks());
                     switch (strategy) {
                         case SelectStrategy.CONTINUE:
@@ -533,13 +535,17 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                             // fall-through to SELECT since the busy-wait is not supported with NIO
 
                         case SelectStrategy.SELECT:
+                            // 下一次定时任务触发截止时间
                             long curDeadlineNanos = nextScheduledTaskDeadlineNanos();
                             if (curDeadlineNanos == -1L) {
-                                curDeadlineNanos = NONE; // nothing on the calendar
+                                // nothing on the calendar
+                                curDeadlineNanos = NONE;
                             }
                             nextWakeupNanos.set(curDeadlineNanos);
                             try {
+                                // 再次判断是否有任务
                                 if (!hasTasks()) {
+                                    // 轮询 I/O 事件
                                     strategy = select(curDeadlineNanos);
                                 }
                             } finally {
@@ -564,6 +570,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                 needsToSelectAgain = false;
                 final int ioRatio = this.ioRatio;
                 boolean ranTasks;
+                // 根据 ioRatio，选择 执行IO操作还是内部队列中的任务
                 if (ioRatio == 100) {
                     try {
                         if (strategy > 0) {
@@ -593,6 +600,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                     }
                     selectCnt = 0;
                 } else if (unexpectedSelectorWakeup(selectCnt)) { // Unexpected wakeup (unusual case)
+                    // 解决JDK的epoll空轮询问题
                     selectCnt = 0;
                 }
             } catch (CancelledKeyException e) {
