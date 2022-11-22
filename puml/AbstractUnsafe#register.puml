@@ -11,14 +11,12 @@ SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 2.2.2 startThread \n 
 SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 2.2.3 doStartThread
 
 ' ----- 分割线 -----
-loop ThreadPerTaskExecutor 线程池
-SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 2.2.3.1 向 NioEventLoop 内部的 executor 提交一个线程(任务) \n             SingleThreadEventExecutor.this.run() \n             执行 NioEventLoop 实现的核心逻辑
+loop 向 ThreadPerTaskExecutor 线程池提交一个线程(任务),这个线程就是真正的工作线程,
+SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 2.2.3.1 SingleThreadEventExecutor.this.run() \n             执行 NioEventLoop 实现的核心逻辑
 end
 ' ----- 分割线 -----
 
+SingleThreadEventExecutor -> SingleThreadEventExecutor: \n x.x.x 其余逻辑暂略
 
-SingleThreadEventLoop <-- SingleThreadEventExecutor
-NioEventLoop <-- SingleThreadEventLoop
-
-Actor <-- NioEventLoop
+Actor <-- SingleThreadEventExecutor
 @enduml

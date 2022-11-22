@@ -1050,8 +1050,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
                 boolean success = false;
                 updateLastExecutionTime();
                 try {
-                    // MARK
-                    // 执行 SingleThreadEventExecutor 的 run() 方法，它在 NioEventLoop 中实现了
+                    // MARK 执行 SingleThreadEventExecutor 的 run() 方法，它在 NioEventLoop 中实现了
                     SingleThreadEventExecutor.this.run();
                     success = true;
                 } catch (Throwable t) {
