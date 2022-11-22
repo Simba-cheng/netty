@@ -539,7 +539,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                             // fall-through to SELECT since the busy-wait is not supported with NIO
 
                         case SelectStrategy.SELECT:
-                            // 任务队列为空的时候，会执行本逻辑
+                            // remind 任务队列为空的时候，会执行本逻辑
 
                             // 下一次定时任务触发截止时间
                             long curDeadlineNanos = nextScheduledTaskDeadlineNanos();
@@ -933,12 +933,30 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         return selector.selectNow();
     }
 
+    /**
+     *
+     * <pre>
+     * 此方法中的 selector 正是 Java NIO 中的多路复用器 Selector
+     *
+     *
+     *
+     * </pre>
+     */
     private int select(long deadlineNanos) throws IOException {
         if (deadlineNanos == NONE) {
             return selector.select();
         }
         // Timeout will only be 0 if deadline is within 5 microsecs
         long timeoutMillis = deadlineToDelayNanos(deadlineNanos + 995000L) / 1000000L;
+
+        /*
+            selector.selectNow() 方法会检查当前是否有就绪的 IO 事件
+                如果有则返回就绪 IO 事件的个数
+                如果没有，则返回0
+
+            selector.selectNow() 是立即返回的，不会阻塞当前线程。
+            selector.select() 是会阻塞当前线程的。
+         */
         return timeoutMillis <= 0 ? selector.selectNow() : selector.select(timeoutMillis);
     }
 
