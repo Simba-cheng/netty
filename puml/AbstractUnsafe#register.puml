@@ -8,11 +8,11 @@ SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 2.2 execute(Runnable 
 SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 2.2.1 addTask(task) \n          将task添加到内部队列 \n          taskQueue#MpscUnboundedArrayQueue
 SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 2.2.2 startThread \n          准备以线程安全启动工作线程
 
-SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 2.2.3 doStartThread \n 向 NioEventLoop 内部的 executor 提交一个线程(任务)
+SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 2.2.3 doStartThread
 
 ' ----- 分割线 -----
 loop ThreadPerTaskExecutor 线程池
-SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 2.2.3.1 SingleThreadEventExecutor.this.run() \n 执行 NioEventLoop 实现的核心逻辑
+SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 2.2.3.1 向 NioEventLoop 内部的 executor 提交一个线程(任务) \n             SingleThreadEventExecutor.this.run() \n             执行 NioEventLoop 实现的核心逻辑
 end
 ' ----- 分割线 -----
 

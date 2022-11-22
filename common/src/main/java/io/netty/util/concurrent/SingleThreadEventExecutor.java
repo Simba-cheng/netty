@@ -1038,7 +1038,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
     private void doStartThread() {
         assert thread == null;
         // 对于 NioEventLoop，这个 executor 就是 ThreadPerTaskExecutor
-        executor.execute(new Runnable() {
+        executor.execute(new Runnable() { // remind <- 这个线程就是 NioEventLoop 内部的工作线程
             @Override
             public void run() {
                 // 这个线程设置为NioEventLoop的内部工作线程
