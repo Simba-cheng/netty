@@ -520,9 +520,8 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         // 死循环处理
         for (;;) {
             try {
-
-                // 当前有任务时，那么执行 selectNowSupplier 代表的方法，也就是 selector.selectNow()
-                // 当前无任务时，那么返回 SelectStrategy.SELECT,也就是-1
+                // selectStrategy 用于控制工作线程的select策略，在存在异步任务的场景，
+                // NioEventLoop 会优先保证 CPU 能够及时处理异步任务；
                 int strategy;
                 try {
                     /*
@@ -577,6 +576,10 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                 selectCnt++;
                 cancelledKeys = 0;
                 needsToSelectAgain = false;
+                // ioRatio参数用于控制 I/O 事件处理和内部任务处理的时间比例，默认值为50
+                // 如果 ioRatio = 100，表示每次处理完 I/O 事件后，会执行所有的 task
+                // 如果 ioRatio < 100，也会优先处理完 I/O 事件，再处理异步任务队列。
+                // 所以无论如何，processSelectedKeys() 都是先执行的。
                 final int ioRatio = this.ioRatio;
                 boolean ranTasks;
                 // 根据 ioRatio，选择 执行IO操作还是内部队列中的任务
