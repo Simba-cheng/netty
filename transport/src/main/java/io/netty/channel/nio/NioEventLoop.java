@@ -240,8 +240,6 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                     Field publicSelectedKeysField = selectorImplClass.getDeclaredField("publicSelectedKeys");
 
                     if (PlatformDependent.javaVersion() >= 9 && PlatformDependent.hasUnsafe()) {
-                        // Let us try to use sun.misc.Unsafe to replace the SelectionKeySet.
-                        // This allows us to also do this in Java9+ without any extra flags.
                         long selectedKeysFieldOffset = PlatformDependent.objectFieldOffset(selectedKeysField);
                         long publicSelectedKeysFieldOffset =
                                 PlatformDependent.objectFieldOffset(publicSelectedKeysField);
@@ -253,7 +251,6 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                                     unwrappedSelector, publicSelectedKeysFieldOffset, selectedKeySet);
                             return null;
                         }
-                        // We could not retrieve the offset, lets try reflection as last-resort.
                     }
 
                     Throwable cause = ReflectionUtil.trySetAccessible(selectedKeysField, true);
@@ -785,17 +782,17 @@ public final class NioEventLoop extends SingleThreadEventLoop {
 
             // 取出 IO 事件以及对应的 Channel
             final SelectionKey k = selectedKeys.keys[i];
+            // 快速释放,便于GC
             selectedKeys.keys[i] = null;
+            // 获取 Channel
             final Object a = k.attachment();
 
-            // 处理该 Channel
+            // 处理 Channel,IO事件
             if (a instanceof AbstractNioChannel) {
-                // MARK
                 processSelectedKey(k, (AbstractNioChannel) a);
             } else {
                 @SuppressWarnings("unchecked")
                 NioTask<SelectableChannel> task = (NioTask<SelectableChannel>) a;
-                // MARK
                 processSelectedKey(k, task);
             }
 
@@ -821,15 +818,8 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                 // 获取要处理 channel 所绑定的 eventLoop线程，如果绑定的不是当前的 IO线程的事件，就不处理
                 eventLoop = ch.eventLoop();
             } catch (Throwable ignored) {
-                // If the channel implementation throws an exception because there is no event loop, we ignore this
-                // because we are only trying to determine if ch is registered to this event loop and thus has authority
-                // to close ch.
                 return;
             }
-            // Only close ch if ch is still registered to this EventLoop. ch could have deregistered from the event loop
-            // and thus the SelectionKey could be cancelled as part of the deregistration process, but the channel is
-            // still healthy and should not be closed.
-            // See https://github.com/netty/netty/issues/5125
             if (eventLoop == this) {
                 // Key 不合法，直接关闭连接
                 unsafe.close(unsafe.voidPromise());
@@ -852,13 +842,10 @@ public final class NioEventLoop extends SingleThreadEventLoop {
 
             // remind 处理可写事件 (优先处理,以释放内存)
             if ((readyOps & SelectionKey.OP_WRITE) != 0) {
-                // Call forceFlush which will also take care of clear the OP_WRITE once there is nothing left to write
                 ch.unsafe().forceFlush();
             }
 
             // remind 处理可读事件
-            // Also check for readOps of 0 to workaround possible JDK bug which may otherwise lead
-            // to a spin loop
             if ((readyOps & (SelectionKey.OP_READ | SelectionKey.OP_ACCEPT)) != 0 || readyOps == 0) {
                 unsafe.read();
             }
