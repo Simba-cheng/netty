@@ -523,8 +523,11 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                 int strategy;
                 try {
                     /*
-                       select处理策略，用于控制select循环行为，包含 CONTINUE、SELECT、BUSY_WAIT 三种策略,Netty不支持 BUSY_WAIT，
-                       所以 BUSY_WAIT 与 SELECT 的执行逻辑是一样的。
+                       确定 select 处理策略，用于控制 select 循环行为，包含 CONTINUE、SELECT、BUSY_WAIT 三种策略,
+                       Netty不支持 BUSY_WAIT，所以 BUSY_WAIT 与 SELECT 的执行逻辑是一样的。
+
+                       当前有任务时，那么执行 selectNowSupplier 代表的方法，也就是 selector.selectNow()
+                       当前无任务时，那么返回 SelectStrategy.SELECT
                      */
                     strategy = selectStrategy.calculateStrategy(selectNowSupplier, hasTasks());
                     switch (strategy) {
@@ -532,9 +535,12 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                             continue;
 
                         case SelectStrategy.BUSY_WAIT:
+                            // NioEventLoop不支持，用于 EpollEventLoop，理论上不会走到这里
                             // fall-through to SELECT since the busy-wait is not supported with NIO
 
                         case SelectStrategy.SELECT:
+                            // 任务队列为空的时候，会执行本逻辑
+
                             // 下一次定时任务触发截止时间
                             long curDeadlineNanos = nextScheduledTaskDeadlineNanos();
                             if (curDeadlineNanos == -1L) {
@@ -545,12 +551,11 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                             try {
                                 // 再次判断是否有任务
                                 if (!hasTasks()) {
-                                    // 轮询 I/O 事件
+                                    // MARK 轮询 I/O 事件(轮训就绪的 channel)
                                     strategy = select(curDeadlineNanos);
                                 }
                             } finally {
-                                // This update is just to help block unnecessary selector wakeups
-                                // so use of lazySet is ok (no race condition)
+                                // 阻止不必要的唤醒
                                 nextWakeupNanos.lazySet(AWAKE);
                             }
                             // fall through
@@ -565,6 +570,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                     continue;
                 }
 
+                // 轮训次数++，用来解决jdk空轮训bug
                 selectCnt++;
                 cancelledKeys = 0;
                 needsToSelectAgain = false;
@@ -574,23 +580,26 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                 if (ioRatio == 100) {
                     try {
                         if (strategy > 0) {
+                            // MARK I/O操作，根据 selectedKey 进行出炉
                             processSelectedKeys();
                         }
                     } finally {
-                        // Ensure we always run tasks.
+                        // MARK 执行完所有任务
                         ranTasks = runAllTasks();
                     }
                 } else if (strategy > 0) {
                     final long ioStartTime = System.nanoTime();
                     try {
+                        // I/O操作，根据selectedKey进行出炉
                         processSelectedKeys();
                     } finally {
-                        // Ensure we always run tasks.
+                        // 按照一定比例执行任务，可能会遗留一部分任务等待下次执行
                         final long ioTime = System.nanoTime() - ioStartTime;
                         ranTasks = runAllTasks(ioTime * (100 - ioRatio) / ioRatio);
                     }
                 } else {
-                    ranTasks = runAllTasks(0); // This will run the minimum number of tasks
+                    // This will run the minimum number of tasks
+                    ranTasks = runAllTasks(0);
                 }
 
                 if (ranTasks || strategy > 0) {
@@ -599,8 +608,9 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                                 selectCnt - 1, selector);
                     }
                     selectCnt = 0;
-                } else if (unexpectedSelectorWakeup(selectCnt)) { // Unexpected wakeup (unusual case)
-                    // 解决JDK的epoll空轮询问题
+                } else if (unexpectedSelectorWakeup(selectCnt)) {
+                    // MARK unexpectedSelectorWakeup 方法用于解决JDK的epoll空轮询问题
+
                     selectCnt = 0;
                 }
             } catch (CancelledKeyException e) {
@@ -631,7 +641,20 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         }
     }
 
-    // returns true if selectCnt should be reset
+    /**
+     * 用于解决JDK NIO中 Epoll 实现的空轮询问题。
+     *
+     * <pre>
+     * 所谓JDK Epoll 空轮询，是指NIO线程在没有感知到select事件时，应该处于阻塞状态，
+     * 但是JDK的epoll实现会出现即使 Selector 轮询的事件列表为空，NIO线程一样可以被唤醒，导致 CPU 100% 占用。
+     * </pre>
+     *
+     * <pre>
+     * Netty 解决JDK Epoll 空轮询 问题的思路就是：
+     * 引入计数器变量，统计一定时间窗口内 select 操作的执行次数，识别出可能存在异常的 Selector 对象，
+     * 然后采用重建 Selector 的方式巧妙地避免了 JDK epoll 空轮询的问题。
+     * </pre>
+     */
     private boolean unexpectedSelectorWakeup(int selectCnt) {
         if (Thread.interrupted()) {
             // Thread was interrupted so reset selected keys and break so we not run into a busy loop.
