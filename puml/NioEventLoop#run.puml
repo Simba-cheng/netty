@@ -22,6 +22,8 @@ executor.execute(new Runnable(){ ... })
 <color:#FF0000>注意,以下逻辑都运行在第4步创建的线程中</color>
 end note
 
+group
+
 SingleThreadEventExecutor -> NioEventLoop: \n 5. run 即:this.run()
 note left
 5#
@@ -47,5 +49,7 @@ loop 'for (;;)' 死循环
 end
 ' ----- 分割线 -----
 
+
 SingleThreadEventExecutor <-- NioEventLoop
+end
 @enduml
