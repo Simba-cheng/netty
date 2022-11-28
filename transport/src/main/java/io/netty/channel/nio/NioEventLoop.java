@@ -569,8 +569,6 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                         default:
                     }
                 } catch (IOException e) {
-                    // If we receive an IOException here its because the Selector is messed up. Let's rebuild
-                    // the selector and retry. https://github.com/netty/netty/issues/8566
                     rebuildSelector0();
                     selectCnt = 0;
                     handleLoopException(e);
@@ -601,7 +599,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                 } else if (strategy > 0) {
                     final long ioStartTime = System.nanoTime();
                     try {
-                        // I/O操作，根据selectedKey进行出炉
+                        // I/O操作，根据 selectedKey 进行出炉
                         processSelectedKeys();
                     } finally {
                         // 按照一定比例执行任务，可能会遗留一部分任务等待下次执行
@@ -709,7 +707,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
      */
     private void processSelectedKeys() {
         if (selectedKeys != null) {
-            // Netty优化过的selectedKeys
+            // Netty 优化过的 selectedKeys
             processSelectedKeysOptimized();
         } else {
             // 正常处理逻辑
@@ -780,11 +778,11 @@ public final class NioEventLoop extends SingleThreadEventLoop {
     private void processSelectedKeysOptimized() {
         for (int i = 0; i < selectedKeys.size; ++i) {
 
-            // 取出 IO 事件以及对应的 Channel
+            // 取出 SelectionKey
             final SelectionKey k = selectedKeys.keys[i];
             // 快速释放,便于GC
             selectedKeys.keys[i] = null;
-            // 获取 Channel
+            // 从 attachment 获得 netty 的 Channel
             final Object a = k.attachment();
 
             // 处理 Channel,IO事件
