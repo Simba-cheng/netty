@@ -1,25 +1,31 @@
 @startuml participant
 
-Actor -> AbstractChannel: register
+Actor -> AbstractChannel: 1. register
 
-AbstractChannel -> SingleThreadEventExecutor: SingleThreadEventExecutor \nexecute(java.lang.Runnable, boolean)
+AbstractChannel -> SingleThreadEventExecutor: 2. SingleThreadEventExecutor \n    execute(java.lang.Runnable, boolean)
 
-SingleThreadEventExecutor -> SingleThreadEventExecutor: \n addTask
+SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 3. addTask
 note right
-将由register方法提交的任务添加到内部队列中(taskQueue)
+3#
+将由register方法提交的任务
+添加到内部队列中(taskQueue)。
 end note
 
-SingleThreadEventExecutor -> SingleThreadEventExecutor: \n doStartThread
-note right
+SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 4. doStartThread
+note left
+4#
 向内部的线程池提交一个线程,
 队列中的那些任务将有这个线程取出并执行。
 executor.execute(new Runnable(){ ... })
 end note
 
-
-
-
-SingleThreadEventExecutor -> NioEventLoop: run \n 即:this.run()
+SingleThreadEventExecutor -> NioEventLoop: \n 5. run 即:this.run()
+note left
+5#
+执行 SingleThreadEventExecutor 的 run() 方法，
+它在 NioEventLoop 中实现了。
+即: SingleThreadEventExecutor.this.run();
+end note
 
 ' ----- 分割线 -----
 loop 'for (;;)' 死循环
