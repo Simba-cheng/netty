@@ -12,11 +12,14 @@ note right
 end note
 
 SingleThreadEventExecutor -> SingleThreadEventExecutor: \n 4. doStartThread
-note left
+note right
 4#
 向内部的线程池提交一个线程,
-队列中的那些任务将有这个线程取出并执行。
+队列中的那些任务将有这个线程取出并执行,
+此线程就是 NioEventLoop 中的工作线程。
 executor.execute(new Runnable(){ ... })
+
+<color:#FF0000>注意,以下逻辑都运行在第4步创建的线程中</color>
 end note
 
 SingleThreadEventExecutor -> NioEventLoop: \n 5. run 即:this.run()
