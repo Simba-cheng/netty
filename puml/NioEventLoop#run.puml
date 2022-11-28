@@ -1,5 +1,24 @@
 @startuml participant
 
+Actor -> AbstractChannel: register
+
+AbstractChannel -> SingleThreadEventExecutor: SingleThreadEventExecutor \nexecute(java.lang.Runnable, boolean)
+
+SingleThreadEventExecutor -> SingleThreadEventExecutor: \n addTask
+note right
+将由register方法提交的任务添加到内部队列中(taskQueue)
+end note
+
+SingleThreadEventExecutor -> SingleThreadEventExecutor: \n doStartThread
+note right
+向内部的线程池提交一个线程,
+队列中的那些任务将有这个线程取出并执行。
+executor.execute(new Runnable(){ ... })
+end note
+
+
+
+
 SingleThreadEventExecutor -> NioEventLoop: run \n 即:this.run()
 
 ' ----- 分割线 -----
