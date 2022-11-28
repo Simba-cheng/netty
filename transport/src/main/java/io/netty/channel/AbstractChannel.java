@@ -527,7 +527,9 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                 register0(promise);
             } else {
                 try {
-                    // 重点: eventLoop.execute(...) 方法
+                    /*
+                        对于 NioEventLoop 创建内部工作线程来说,重点方法是: eventLoop.execute(...)
+                     */
                     eventLoop.execute(new Runnable() {
                         @Override
                         public void run() {
