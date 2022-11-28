@@ -796,7 +796,9 @@ public final class NioEventLoop extends SingleThreadEventLoop {
 
             // 判断是否该再来次轮询
             if (needsToSelectAgain) {
+                // 清理未处理的 key
                 selectedKeys.reset(i + 1);
+                // 重新轮询
                 selectAgain();
                 i = -1;
             }
@@ -810,7 +812,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
 
         // 获取 channel 的内部辅助类 Unsafe，通过 Unsafe 进行IO事件处理
         final AbstractNioChannel.NioUnsafe unsafe = ch.unsafe();
-        if (!k.isValid()) { // 检查 Key 是否合法
+        if (!k.isValid()) { // 检查 Key 是否合法 (检查连接是否有效)
             final EventLoop eventLoop;
             try {
                 // 获取要处理 channel 所绑定的 eventLoop线程，如果绑定的不是当前的 IO线程的事件，就不处理
@@ -828,7 +830,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         try {
             int readyOps = k.readyOps();
 
-            // 建立连接事件
+            // 处理 OP_CONNECT 事件
             if ((readyOps & SelectionKey.OP_CONNECT) != 0) {
                 // 将该事件从事件集合中清除，避免事件集合中一直存在连接建立事件
                 int ops = k.interestOps();
