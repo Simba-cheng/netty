@@ -49,8 +49,21 @@ group 'for (;;)' 死循环
     group if( strategy = SelectStrategy.SELECT ) [<size:13><color:#FF8C00>即taskQueue任务队列没有任务</color></size>]
         NioEventLoop -> NioEventLoop: \n ② select(long deadlineNanos) \n    尝试轮询IO事件(就绪的channel) \n    可能会阻塞
     else 'else' <size:13><color:#FF8C00>taskQueue任务队列中有任务</color></size>
+
         NioEventLoop -> NioEventLoop: \n ③ processSelectedKeys() \n    IO事件处理
+        group ③ processSelectedKeys 详细逻辑
+
+            group if (selectedKeys != null)
+
+            else selector.selectedKeys()
+
+            end
+
+        end
+
         NioEventLoop -> NioEventLoop: \n ④ runAllTasks()、runAllTasks(timeoutNanos) \n    执行taskQueue任务队列中的任务
+        group ④ runAllTasks(timeoutNanos) 详细逻辑
+        end
     end
 end
 ' ----- 分割线 -----
