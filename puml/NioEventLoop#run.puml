@@ -1,9 +1,9 @@
 '①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳
 @startuml participant
 
-Actor -> AbstractChannel: 1. register
+Actor -> AbstractChannel: \n 1. register
 
-AbstractChannel -> SingleThreadEventExecutor: 2. 将任务交给 NioEventLoop 处理
+AbstractChannel -> SingleThreadEventExecutor: \n 2. 将任务交给 NioEventLoop 处理
 note right
 2#
 以下是调用栈顺序:
@@ -51,18 +51,40 @@ group 'for (;;)' 死循环
     else 'else' <size:13><color:#FF8C00>taskQueue任务队列中有任务</color></size>
 
         NioEventLoop -> NioEventLoop: \n ③ processSelectedKeys() \n    IO事件处理
-        group <color:#836FFF>③ processSelectedKeys 详细逻辑</color>
+        group <color:#836FFF>③ processSelectedKeys 方法内逻辑</color>
 
-            group if (selectedKeys != null)
-                NioEventLoop -> NioEventLoop: processSelectedKeysOptimized
-            else selector.selectedKeys()
-                NioEventLoop -> NioEventLoop: processSelectedKeysPlain
+            group if (selectedKeys != null) [selectedKeys 集合类型是 Netty 优化过的 SelectedSelectionKeySet]
+                NioEventLoop -> NioEventLoop: \n\n (1). processSelectedKeysOptimized
+                note right
+                针对 Netty 优化过的 selectedKeys 集合的处理
+                end note
+            else selector.selectedKeys(), 此集合类型是JDK中的HashSet
+                NioEventLoop -> NioEventLoop: \n\n (2).processSelectedKeysPlain
+                note right
+                正常处理逻辑
+                end note
+            end
+
+            NioEventLoop -> NioEventLoop: \n\n (3).processSelectedKey
+            note left
+            (3)#
+            上面不论执行(1)还是(2)判断分支,
+            最终调用的就是 processSelectedKey 方法
+            end note
+            group (3) processSelectedKey 方法内逻辑
+                NioEventLoop -> NioEventLoop: \n 获取 Channel 对应的 unsafe
+                note right
+                通过 Unsafe 处理IO事件
+                end note
+                NioEventLoop -> NioEventLoop: \n 处理 OP_CONNECT 事件
+                NioEventLoop -> NioEventLoop: \n 处理 OP_WRITE 事件
+                NioEventLoop -> NioEventLoop: \n 处理 OP_READ 事件
             end
 
         end
 
-        NioEventLoop -> NioEventLoop: \n ④ runAllTasks()、runAllTasks(timeoutNanos) \n    执行taskQueue任务队列中的任务
-        group <color:#836FFF>④ runAllTasks(timeoutNanos) 详细逻辑</color>
+        NioEventLoop -> NioEventLoop: \n\n ④ runAllTasks()、runAllTasks(timeoutNanos) \n    执行taskQueue任务队列中的任务
+        group <color:#836FFF>④ runAllTasks(timeoutNanos) 方法内逻辑</color>
         end
     end
 end
