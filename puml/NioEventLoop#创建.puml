@@ -1,0 +1,6 @@
+@startuml participant
+
+Actor -> NioEventLoop: 1 create
+
+Actor <-- NioEventLoop
+@enduml
