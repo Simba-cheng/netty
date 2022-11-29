@@ -51,18 +51,18 @@ group 'for (;;)' 死循环
     else 'else' <size:13><color:#FF8C00>taskQueue任务队列中有任务</color></size>
 
         NioEventLoop -> NioEventLoop: \n ③ processSelectedKeys() \n    IO事件处理
-        group ③ processSelectedKeys 详细逻辑
+        group <color:#836FFF>③ processSelectedKeys 详细逻辑</color>
 
             group if (selectedKeys != null)
-
+                NioEventLoop -> NioEventLoop: processSelectedKeysOptimized
             else selector.selectedKeys()
-
+                NioEventLoop -> NioEventLoop: processSelectedKeysPlain
             end
 
         end
 
         NioEventLoop -> NioEventLoop: \n ④ runAllTasks()、runAllTasks(timeoutNanos) \n    执行taskQueue任务队列中的任务
-        group ④ runAllTasks(timeoutNanos) 详细逻辑
+        group <color:#836FFF>④ runAllTasks(timeoutNanos) 详细逻辑</color>
         end
     end
 end
