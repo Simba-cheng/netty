@@ -85,12 +85,21 @@ group 'for (;;)' 死循环
 
         NioEventLoop -> NioEventLoop: \n\n ④ runAllTasks()、runAllTasks(timeoutNanos) \n    执行taskQueue任务队列中的任务
         group <color:#836FFF>④ runAllTasks(timeoutNanos) 方法内逻辑</color>
+            NioEventLoop -> NioEventLoop: \n\n 合并任务
+                note right
+                从 定时任务队列(scheduledTaskQueue) 中取出执行时间小于当前时间的
+                定时任务(scheduledTask),添加到 普通任务队列(taskQueue) 中。
+                end note
+            NioEventLoop -> NioEventLoop: \n\n 处理任务
+                note right
+                从 普通任务队列(taskQueue) 中取出任务并执行
+                end note
         end
     end
 end
 ' ----- 分割线 -----
 
 
-SingleThreadEventExecutor <-- NioEventLoop
+Actor <-- NioEventLoop: \n
 end
 @enduml
