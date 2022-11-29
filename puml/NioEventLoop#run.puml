@@ -1,3 +1,4 @@
+'①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳
 @startuml participant
 
 Actor -> AbstractChannel: 1. register
@@ -39,21 +40,17 @@ end note
 
 ' ----- 分割线 -----
 group 'for (;;)' 死循环
-    NioEventLoop -> NioEventLoop: \n 1 检查 taskQueue 任务数 \n   获取 strategy 标识
+    NioEventLoop -> NioEventLoop: \n ① 检查 taskQueue 任务数 \n   获取 strategy 标识
     note right
     在存在异步任务的场景,
     NioEventLoop 会优先保证CPU能够及时处理异步任务。
     end note
 
-    group strategy = SelectStrategy.SELECT [<size:13><color:#FF8C00>即taskQueue任务队列没有任务</color></size>]
-        NioEventLoop -> NioEventLoop: \n 2 select(long deadlineNanos) \n    尝试轮询IO事件(就绪的channel) \n    可能会阻塞
-    else <size:13><color:#FF8C00>taskQueue任务队列中有任务</color></size>
-        NioEventLoop -> NioEventLoop: \n 3 IO事件处理 processSelectedKeys
-'        NioEventLoop -> NioEventLoop: \n 3.1 处理 OP_CONNECT 事件(建立连接事件)
-'        NioEventLoop -> NioEventLoop: \n 3.2 处理 OP_WRITE 事件(写事件)
-'        NioEventLoop -> NioEventLoop: \n 3.3 处理 OP_READ 事件(读事件)
-
-        NioEventLoop -> NioEventLoop: \n 4 执行taskQueue任务队列中的人物 runAllTasks
+    group if( strategy = SelectStrategy.SELECT ) [<size:13><color:#FF8C00>即taskQueue任务队列没有任务</color></size>]
+        NioEventLoop -> NioEventLoop: \n ② select(long deadlineNanos) \n    尝试轮询IO事件(就绪的channel) \n    可能会阻塞
+    else 'else' <size:13><color:#FF8C00>taskQueue任务队列中有任务</color></size>
+        NioEventLoop -> NioEventLoop: \n ③ processSelectedKeys() \n    IO事件处理
+        NioEventLoop -> NioEventLoop: \n ④ runAllTasks()、runAllTasks(timeoutNanos) \n    执行taskQueue任务队列中的任务
     end
 end
 ' ----- 分割线 -----
