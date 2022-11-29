@@ -2,13 +2,31 @@
 
 Actor -> NioEventLoopGroup: \n\n 1. new NioEventLoopGroup(); \n    创建 NioEventLoopGroup 对象
 
+NioEventLoopGroup -> NioEventLoopGroup: \n 调用重载的构造器
+note right
+NioEventLoopGroup()
+NioEventLoopGroup(int)
+NioEventLoopGroup(int, java.util.concurrent.Executor)
+NioEventLoopGroup(int, Executor, SelectorProvider)
+NioEventLoopGroup(int, Executor, SelectorProvider, SelectStrategyFactory)
+end note
+
 NioEventLoopGroup -> MultithreadEventLoopGroup: \n\n 2. super 向上调用父类构造器
+note right
+MultithreadEventLoopGroup(int, Executor, Object...)
+end note
 
 MultithreadEventLoopGroup -> MultithreadEventExecutorGroup: \n\n 3. super 向上调用父类构造器
+note right
+MultithreadEventExecutorGroup(int, Executor, Object...)
+end note
+
 
 group MultithreadEventExecutorGroup构造器中的逻辑
 
-    MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: \n\n
+    MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: \n\n 创建线程池
+
+
 
 end
 
