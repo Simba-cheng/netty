@@ -505,7 +505,6 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
 
         // 处理任务
         Runnable task = pollTask();
-        // 如果队列中任务取完了,进行收尾工作
         if (task == null) {
             afterRunningAllTasks();
             return false;
@@ -535,7 +534,6 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
             }
         }
 
-        // 收尾工作
         afterRunningAllTasks();
         this.lastExecutionTime = lastExecutionTime;
         return true;
