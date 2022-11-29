@@ -520,7 +520,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
             // 执行任务
             safeExecute(task);
             runTasks ++;
-            // 每执行64个任务就检查下是否超时
+            // 每执行64个任务就检查下是否超时,超时后不再继续执行
             if ((runTasks & 0x3F) == 0) {
                 lastExecutionTime = getCurrentTimeNanos();
                 if (lastExecutionTime >= deadline) {
