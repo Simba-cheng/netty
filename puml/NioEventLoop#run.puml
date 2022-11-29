@@ -68,10 +68,10 @@ group 'for (;;)' 死循环
             NioEventLoop -> NioEventLoop: \n\n (3).processSelectedKey
             note left
             (3)#
-            上面不论执行(1)还是(2)判断分支,
-            最终调用的就是 processSelectedKey 方法
+            上面不论进入 (1)分支 还是 (2)分支,
+            最终调用的是 processSelectedKey 方法
             end note
-            group (3) processSelectedKey 方法内逻辑
+            group <color:#836FFF>(3) processSelectedKey 方法内逻辑</color>
                 NioEventLoop -> NioEventLoop: \n 获取 Channel 对应的 unsafe
                 note right
                 通过 Unsafe 处理IO事件
