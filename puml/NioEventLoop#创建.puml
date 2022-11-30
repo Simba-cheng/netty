@@ -72,6 +72,8 @@ group <color:#836FFF>5# MultithreadEventExecutorGroup 构造器中的逻辑</col
 
     NioEventLoopGroup -> NioEventLoopGroup: \n\n ③ 设置选择器
 
+    NioEventLoopGroup -> NioEventLoopGroup: \n\n ④ 其他逻辑略
+
 end
 
 Actor <--[#EE7621] NioEventLoopGroup
