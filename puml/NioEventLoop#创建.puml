@@ -2,31 +2,65 @@
 
 Actor -> NioEventLoopGroup: \n\n 1. new NioEventLoopGroup(); \n    创建 NioEventLoopGroup 对象
 
-NioEventLoopGroup -> NioEventLoopGroup: \n 调用重载的构造器
+NioEventLoopGroup -> NioEventLoopGroup: \n 2. 调用重载构造器
 note right
-NioEventLoopGroup()
-NioEventLoopGroup(int)
-NioEventLoopGroup(int, java.util.concurrent.Executor)
-NioEventLoopGroup(int, Executor, SelectorProvider)
-NioEventLoopGroup(int, Executor, SelectorProvider, SelectStrategyFactory)
+2#
+↓ NioEventLoopGroup()
+↓ NioEventLoopGroup(int)
+↓ NioEventLoopGroup(int, java.util.concurrent.Executor)
+↓ NioEventLoopGroup(int, Executor, SelectorProvider)
+↓ NioEventLoopGroup(int, Executor, SelectorProvider, SelectStrategyFactory)
 end note
 
-NioEventLoopGroup -> MultithreadEventLoopGroup: \n\n 2. super 向上调用父类构造器
-note right
-MultithreadEventLoopGroup(int, Executor, Object...)
-end note
+NioEventLoopGroup -> MultithreadEventLoopGroup: \n\n 3. super 向上调用父类构造器 \n     MultithreadEventLoopGroup(int, Executor, Object...)
 
-MultithreadEventLoopGroup -> MultithreadEventExecutorGroup: \n\n 3. super 向上调用父类构造器
-note right
-MultithreadEventExecutorGroup(int, Executor, Object...)
-end note
+MultithreadEventLoopGroup -> MultithreadEventExecutorGroup: \n\n 4. super 向上调用父类构造器 \n     MultithreadEventExecutorGroup(int, Executor, Object...)
+
+MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: \n\n 5. 调用重载构造器 \n     MultithreadEventExecutorGroup(int, Executor, EventExecutorChooserFactory, Object...)
+
+group <color:#836FFF>5# MultithreadEventExecutorGroup 构造器中的逻辑</color>
+
+    MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: \n\n ① 创建线程池
+    note left
+    ①#
+    使用 NioEventLoopGroup 默认构造器，
+    没有指定线程池，那么此处线程池是: ThreadPerTaskExecutor
+    end note
+
+    MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: \n\n\n ② 创建 eventLoop 数组,根据 nThreads
+    note left
+    ②#
+    使用 NioEventLoopGroup 默认构造器，那么 nThreads 为0。
+    end note
+
+    loop <color:#FF4500>for (int i = 0; i < nThreads; i ++) ; 依据 nThreads 数量,创建 EventLoop</color>
+
+'    skinparam sequenceMessageAlign center
+    MultithreadEventExecutorGroup -> NioEventLoopGroup: \n\n\n ③ newChild,调用 NioEventLoopGroup 中的实现
+    note right
+    ③#
+    newChild 是定义在 MultithreadEventExecutorGroup 中的抽象方法,
+    NioEventLoopGroup 中进行了实现
+    end note
+
+    skinparam sequenceMessageAlign right
+    NioEventLoopGroup -> NioEventLoop: \n\n ④ new NioEventLoop \n     创建 NioEventLoop
+        note right
+        ④#
+        new NioEventLoop(this, executor, selectorProvider, selectStrategyFactory.newSelectStrategy(),
+        rejectedExecutionHandler, taskQueueFactory, tailTaskQueueFactory);
+        end note
+        group <color:#836FFF>④ 创建 NioEventLoop</color>
+
+        NioEventLoop -> SingleThreadEventLoop: \n\n super 向上调用父类构造器
+        NioEventLoop -> NioEventLoop: \n\n 创建 selector
 
 
-group MultithreadEventExecutorGroup构造器中的逻辑
+        end
 
-    MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: \n\n 创建线程池
+    end
 
-
+'③④⑤⑥⑦⑧
 
 end
 
