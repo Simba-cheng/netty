@@ -1000,12 +1000,13 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
     private static final long SCHEDULE_PURGE_INTERVAL = TimeUnit.SECONDS.toNanos(1);
 
     private void startThread() {
+        // 确保 doStartThread 方法只会执行一次。
         if (state == ST_NOT_STARTED) {
             // CAS操作，以非阻塞的线程安全方式更新
             if (STATE_UPDATER.compareAndSet(this, ST_NOT_STARTED, ST_STARTED)) {
                 boolean success = false;
                 try {
-                    // 启动内部线程
+                    // 实际启动内部线程
                     doStartThread();
                     success = true;
                 } finally {
