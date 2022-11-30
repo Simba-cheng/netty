@@ -35,34 +35,44 @@ group <color:#836FFF>5# MultithreadEventExecutorGroup 构造器中的逻辑</col
 
     loop <color:#FF4500>for (int i = 0; i < nThreads; i ++) ; 依据 nThreads 数量,创建 EventLoop</color>
 
-'    skinparam sequenceMessageAlign center
-    MultithreadEventExecutorGroup -> NioEventLoopGroup: \n\n\n ③ newChild,调用 NioEventLoopGroup 中的实现
-    note right
-    ③#
-    newChild 是定义在 MultithreadEventExecutorGroup 中的抽象方法,
-    NioEventLoopGroup 中进行了实现
-    end note
+    skinparam sequenceMessageAlign left
+    MultithreadEventExecutorGroup -> NioEventLoopGroup: \n\n\n ②.1 newChild \n     newChild 是定义在 MultithreadEventExecutorGroup 中的抽象方法,NioEventLoopGroup 中进行了实现
 
-    skinparam sequenceMessageAlign right
-    NioEventLoopGroup -> NioEventLoop: \n\n ④ new NioEventLoop \n     创建 NioEventLoop
-        note right
-        ④#
-        new NioEventLoop(this, executor, selectorProvider, selectStrategyFactory.newSelectStrategy(),
-        rejectedExecutionHandler, taskQueueFactory, tailTaskQueueFactory);
-        end note
+    skinparam sequenceMessageAlign left
+    NioEventLoopGroup -> NioEventLoop: \n\n\n  ②.2 创建 NioEventLoop \n      new NioEventLoop(this, executor, selectorProvider, selectStrategyFactory.newSelectStrategy(),rejectedExecutionHandler, taskQueueFactory, tailTaskQueueFactory);
+'        note right
+'        ④#
+
+'        end note
         group <color:#836FFF>④ 创建 NioEventLoop</color>
 
-        NioEventLoop -> SingleThreadEventLoop: \n\n super 向上调用父类构造器
-        NioEventLoop -> NioEventLoop: \n\n 创建 selector
+        NioEventLoop -> NioEventLoop: \n\n 1) newTaskQueue 初始化任务队列 \n      默认是 MpscChunkedArrayQueue 类型的队列,长度16
 
+        NioEventLoop -> SingleThreadEventLoop: \n\n 2) super 向上调用父类构造器 \n SingleThreadEventLoop(EventLoopGroup, Executor, boolean,Queue<Runnable>, Queue<Runnable>, RejectedExecutionHandler)
+
+        SingleThreadEventLoop -> SingleThreadEventExecutor: \n\n 2.1) super 向上调用父类构造器 \n SingleThreadEventExecutor(EventExecutorGroup, Executor, boolean, Queue<Runnable>, RejectedExecutionHandler)
+
+        SingleThreadEventExecutor -> SingleThreadEventExecutor: \n\n 2.1.1) 设置执行任务的线程池
+
+        SingleThreadEventExecutor -> SingleThreadEventExecutor: \n\n 2.1.2) 设置 taskQueue
+
+        SingleThreadEventExecutor -> SingleThreadEventExecutor: \n\n 2.1.3) 设置其他参数
+
+        SingleThreadEventExecutor [#EE7621]--> NioEventLoop: \n\n
+
+        NioEventLoop -> NioEventLoop: \n\n 3) 创建 selector
+
+        NioEventLoop -> NioEventLoop: \n\n 4) 设置其他参数
 
         end
 
+        NioEventLoop [#EE7621]--> NioEventLoopGroup: \n\n
+
     end
 
-'③④⑤⑥⑦⑧
+    NioEventLoopGroup -> NioEventLoopGroup: \n\n ③ 设置选择器
 
 end
 
-Actor <-- NioEventLoopGroup
+Actor <--[#EE7621] NioEventLoopGroup
 @enduml
