@@ -948,7 +948,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
             return selector.select();
         }
 
-        // 如果 deadlineNanos 小于5纳秒，则为0,，否则取整为1毫秒
+        // 如果 deadlineNanos 小于5纳秒，则为0,否则取整为1毫秒
         // 这段操作是为了向上取整，转成毫秒
         long timeoutMillis = deadlineToDelayNanos(deadlineNanos + 995000L) / 1000000L;
 
