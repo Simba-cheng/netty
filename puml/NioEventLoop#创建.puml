@@ -30,7 +30,7 @@ group <color:#836FFF>5# MultithreadEventExecutorGroup 构造器中的逻辑</col
     MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: \n\n\n ② 创建 eventLoop 数组,根据 nThreads
     note left
     ②#
-    使用 NioEventLoopGroup 默认构造器，那么 nThreads 为0。
+    使用 NioEventLoopGroup 默认构造器，那么 nThreads 是 CPU*2。
     end note
 
     loop <color:#FF4500>for (int i = 0; i < nThreads; i ++) ; 依据 nThreads 数量,创建 EventLoop</color>
