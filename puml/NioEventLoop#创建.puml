@@ -18,7 +18,7 @@ MultithreadEventLoopGroup -> MultithreadEventExecutorGroup: \n\n 4. super 向上
 
 MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: \n\n 5. 调用重载构造器 \n     MultithreadEventExecutorGroup(int, Executor, EventExecutorChooserFactory, Object...)
 
-group <color:#836FFF>5# MultithreadEventExecutorGroup 构造器中的逻辑</color>
+group <color:#836FFF><size:15>5# MultithreadEventExecutorGroup 构造器中的逻辑</size></color>
 
     MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: \n\n ① 创建线程池
     note left
@@ -33,7 +33,7 @@ group <color:#836FFF>5# MultithreadEventExecutorGroup 构造器中的逻辑</col
     使用 NioEventLoopGroup 默认构造器，那么 nThreads 是 CPU*2。
     end note
 
-    loop <color:#FF4500>for (int i = 0; i < nThreads; i ++) ; 依据 nThreads 数量,创建 EventLoop</color>
+    loop <color:#FF4500><size:14>for (int i = 0; i < nThreads; i ++) ; 依据 nThreads 数量,创建 EventLoop</size></color>
 
     skinparam sequenceMessageAlign left
     MultithreadEventExecutorGroup -> NioEventLoopGroup: \n\n\n ②.1 newChild \n     newChild 是定义在 MultithreadEventExecutorGroup 中的抽象方法,NioEventLoopGroup 中进行了实现
@@ -44,7 +44,7 @@ group <color:#836FFF>5# MultithreadEventExecutorGroup 构造器中的逻辑</col
 '        ④#
 
 '        end note
-        group <color:#836FFF>④ 创建 NioEventLoop</color>
+        group <color:#836FFF><size:15>④ 创建 NioEventLoop</size></color>
 
         NioEventLoop -> NioEventLoop: \n\n 1) newTaskQueue 初始化任务队列 \n      默认是 MpscChunkedArrayQueue 类型的队列,长度16
 
