@@ -142,6 +142,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
 
     /**
      * 初始化 channel
+     *
      * @param channel NioServerSocketChannel,由 serverBootstrap.channel 方法设置
      */
     @Override
@@ -174,7 +175,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         final Entry<AttributeKey<?>, Object>[] currentChildAttrs = newAttributesArray(childAttrs);
 
         /*
-            装配 pipeline 流水线
+            装配 NioServerSocketChannel 的 pipeline 流水线
 
             ChannelInitializer 一次性、初始化handler
                 它会添加 ServerBootstrapAcceptor handler,添加完成后自己就移除了。
@@ -183,7 +184,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         p.addLast(new ChannelInitializer<Channel>() {
             @Override
             public void initChannel(final Channel ch) {
-                // 注意：这里的ch和上面的channel是同一个对象,即:NioServerSocketChannel
+                // 注意：这里的ch和上面的channel是同一个对象,即: NioServerSocketChannel
 
                 // 从 NioServerSocketChannel 中取出 pipeline
                 final ChannelPipeline pipeline = ch.pipeline();

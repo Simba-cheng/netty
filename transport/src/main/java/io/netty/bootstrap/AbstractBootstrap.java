@@ -284,7 +284,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     private ChannelFuture doBind(final SocketAddress localAddress) {
 
         /*
-            创建、初始化、注册 channel
+            MARK 创建、初始化、注册 channel
 
             1. 创建 serverSocketChannel
             2. 初始化
