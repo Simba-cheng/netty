@@ -367,7 +367,8 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
 
            因此这里可以理解为: 将 NioServerSocketChannel 注册到 parentGroup 中.
 
-           config().group(): 返回的是 parentGroup ,即:用于监听客户端连接,专门负责与客户端创建连接.
+           config().group(): 返回的是 parentGroup ,即:用于监听客户端连接,专门负责与客户端创建连接,
+           因此实现类是 MultithreadEventLoopGroup
          */
         ChannelFuture regFuture = config().group().register(channel);
         if (regFuture.cause() != null) {
@@ -396,11 +397,12 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
             final ChannelFuture regFuture, final Channel channel,
             final SocketAddress localAddress, final ChannelPromise promise) {
 
-        // 向ServerSocketChannel所属的EventLoop中提交一个异步任务
+        // 向 ServerSocketChannel 所属的 EventLoop 中提交一个异步任务
 
         /*
             在channelRegistered()被触发之前调用此方法。让用户处理程序有机会在其channelRegistered()实现中设置管道。
             此处的channel,对于 ServerBootstrap 来说,一般是 NioServerSocketChannel,channel具体类型,是由 serverBootstrap.channel 方法设置的。
+            实现类 SingleThreadEventExecutor#execute(java.lang.Runnable)
          */
         channel.eventLoop().execute(new Runnable() {
             @Override
