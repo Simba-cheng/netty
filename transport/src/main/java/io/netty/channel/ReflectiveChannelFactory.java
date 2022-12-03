@@ -31,6 +31,8 @@ public class ReflectiveChannelFactory<T extends Channel> implements ChannelFacto
     public ReflectiveChannelFactory(Class<? extends T> clazz) {
         ObjectUtil.checkNotNull(clazz, "clazz");
         try {
+            // getConstructor 方法用于获取 '对应参数类型' 的构造函数
+            // 再通过调用 newInstance 方法时传入构造方法参数值，就可以构造一个实例。
             this.constructor = clazz.getConstructor();
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException("Class " + StringUtil.simpleClassName(clazz) +
