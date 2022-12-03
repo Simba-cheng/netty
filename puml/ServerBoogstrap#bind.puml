@@ -1,0 +1,24 @@
+@startuml
+participant Actor
+
+Actor -> AbstractBootstrap: doBind
+
+AbstractBootstrap -> AbstractBootstrap: \n ① validate \n     启动校验
+note right
+校验以下参数:
+    group:
+        即 parentGroup(parentNioEventLoopGroup) 用于监听客户端连接,专门负责与 client 建立连接。
+
+    channelFactory:
+        用于实例化创建 channel 的工厂,由 serverBootstrap.channel 方法设置。
+
+    childHandler:
+        用于给 Channel 分配业务处理器，即: 用来处理 '已建立连接客户端 Channel' 的IO事件。
+
+    childGroup:
+        即 childNioEventLoopGroup,用于监听每一个 '已建立连接客户端 Channel' 发生的IO读写事件
+end note
+
+AbstractBootstrap -> AbstractBootstrap: \n ② doBind \n     核心业务逻辑
+
+@enduml

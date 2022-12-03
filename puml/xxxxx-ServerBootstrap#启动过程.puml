@@ -1,0 +1,26 @@
+@startuml
+participant Actor
+
+Actor -> AbstractBootstrap: doBind
+
+AbstractBootstrap -> AbstractBootstrap: \n\n\n initAndRegister
+    group  #LightBlue initAndRegister
+        AbstractBootstrap -> ReflectiveChannelFactory: \n\n newChannel
+        ReflectiveChannelFactory -> ReflectiveChannelFactory:
+        ReflectiveChannelFactory --> AbstractBootstrap:
+
+        AbstractBootstrap -> ServerBootstrap: \n\n init 初始化channel
+
+        AbstractBootstrap -> AbstractBootstrap: \n\n register
+    end
+
+
+AbstractBootstrap -> AbstractBootstrap: \n\n\n doBind0
+    group #Pink doBind0
+
+    end
+
+
+
+
+@enduml
