@@ -1,26 +1,24 @@
 @startuml
 
-Actor -> AbstractBootstrap: doBind
+Actor -> AbstractBootstrap: bind
 
-AbstractBootstrap -> AbstractBootstrap: \n ① validate \n     启动校验
+AbstractBootstrap -> AbstractBootstrap: \n ① validate \n     参数校验
 
 AbstractBootstrap -> AbstractBootstrap: \n ② doBind \n     核心业务逻辑
 
-    group #FDF5E6 doBind
-        AbstractBootstrap -> AbstractBootstrap: \n\n ⑴. initAndRegister
+'    group #FDF5E6 doBind
+'        AbstractBootstrap -> AbstractBootstrap: \n\n ⑴. initAndRegister
 
-            group #F0FFF0 initAndRegister
+'            group #F0FFF0 initAndRegister
+'                AbstractBootstrap -> ServerBootstrap: \n\n <size:16>❶</size> init
+'                ServerBootstrap --> AbstractBootstrap
+'
+'                AbstractBootstrap -> MultithreadEventLoopGroup: \n\n <size:16>❷</size> register
+'                MultithreadEventLoopGroup --> AbstractBootstrap
+'            end
 
-            AbstractBootstrap -> ServerBootstrap: \n\n <size:16>❶</size> init
-            ServerBootstrap --> AbstractBootstrap
+'        AbstractBootstrap -> AbstractBootstrap: \n\n ⑵. doBind0
 
-            AbstractBootstrap -> MultithreadEventLoopGroup: \n\n <size:16>❷</size> register
-            MultithreadEventLoopGroup --> AbstractBootstrap
-
-            end
-
-        AbstractBootstrap -> AbstractBootstrap: \n\n ⑵. doBind0
-
-    end
+'    end
 
 @enduml
