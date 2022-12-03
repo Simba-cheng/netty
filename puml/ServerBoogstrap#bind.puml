@@ -1,6 +1,4 @@
 @startuml
-participant Actor
-
 Actor -> AbstractBootstrap: doBind
 
 AbstractBootstrap -> AbstractBootstrap: \n ① validate \n     启动校验
