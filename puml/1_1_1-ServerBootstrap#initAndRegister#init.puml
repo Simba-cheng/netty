@@ -2,10 +2,10 @@
 
 AbstractBootstrap -> ServerBootstrap: init
 
-ServerBootstrap -> ServerBootstrap: \n setChannelOptions
-ServerBootstrap -> ServerBootstrap: \n setAttributes
-ServerBootstrap -> ServerBootstrap: \n add handler
-ServerBootstrap -> ServerBootstrap: \n add ServerBootstrapAcceptor
+ServerBootstrap -> ServerBootstrap: \n ① setChannelOptions
+ServerBootstrap -> ServerBootstrap: \n ② setAttributes
+ServerBootstrap -> ServerBootstrap: \n ③ add handler
+ServerBootstrap -> ServerBootstrap: \n ④ add ServerBootstrapAcceptor
 
 ServerBootstrap --> AbstractBootstrap: \n
 

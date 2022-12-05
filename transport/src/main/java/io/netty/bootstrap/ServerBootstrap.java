@@ -198,6 +198,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
                 }
 
                 // 向 NioServerSocketChannel 所属的 NioEventLoop 提交一个异步任务
+                // ch.eventLoop() 进入 AbstractNioChannel 类的实现方法
                 // TODO 疑问,此时 NioServerSocketChannel 还未注册到 NioEventLoop 的 selector上, 此时理论上 ch.eventLoop() 应该是null？
                 ch.eventLoop().execute(new Runnable() {
                     @Override
