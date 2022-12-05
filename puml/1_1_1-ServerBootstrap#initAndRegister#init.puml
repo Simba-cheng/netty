@@ -3,7 +3,7 @@
 '箭头上的文字居中
 skinparam sequenceMessageAlign center
 
-AbstractBootstrap -> ServerBootstrap: \n init 初始化 NioServerSocketChannel
+AbstractBootstrap -> ServerBootstrap: \n init \n 初始化 NioServerSocketChannel
 
 group init内部逻辑
 
@@ -25,18 +25,23 @@ group init内部逻辑
         end note
     AbstractBootstrap --> ServerBootstrap
 
-    group 装配 NioServerSocketChannel 的 pipeline 流水线
+    group #ADD8E6 装配 pipeline 流水线(initChannel) [<color:#FF4500><size:14> 注意: 此处装配的 pipeline 在该 NioServerSocketChannel 注册完成后才会被调用!! </size></color>]
         ServerBootstrap -> ServerBootstrap: \n ③ add handler
             note right
                 添加自定义handler
                 是由 serverBootstrap.handler 方法配置的
                 @see io.netty.bootstrap.AbstractBootstrap.handler
             end note
-        ServerBootstrap -> ServerBootstrap: \n ④ add ServerBootstrapAcceptor
+
+        group #FFC1C1 Runnable 异步任务
+            ServerBootstrap -> ServerBootstrap: \n ④ add ServerBootstrapAcceptor
+                note right
+                    向 NioServerSocketChannel 所属的 NioEventLoop 提交一个 Runnable 异步任务。
+                    Runnable 作用就是在 NioServerSocketChannel 的 pipeline 中添加一个 ServerBootstrapAcceptor 处理器。
+                end note
+        end
     end
-
     ServerBootstrap --> AbstractBootstrap: \n
-
 end
 
 @enduml
