@@ -180,6 +180,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
                 ServerBootstrapAcceptor handler 负责与客户端建立连接
          */
         p.addLast(new ChannelInitializer<Channel>() {
+            // remind initChannel 方法会在该 ServerSocketChannel 注册完成后被调用
             @Override
             public void initChannel(final Channel ch) {
                 // 注意：这里的 ch 和上面的 channel 是同一个对象,即: NioServerSocketChannel
@@ -197,9 +198,13 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
                     pipeline.addLast(handler);
                 }
 
+                /*
+                    在之前还有疑问,此时 NioServerSocketChannel 还未注册到 NioEventLoop 的 selector上, 此时理论上 ch.eventLoop() 应该是null？
+                    remind initChannel 方法会在该 ServerSocketChannel 注册完成后被调用
+                 */
+
                 // 向 NioServerSocketChannel 所属的 NioEventLoop 提交一个异步任务
                 // ch.eventLoop() 进入 AbstractNioChannel 类的实现方法
-                // TODO 疑问,此时 NioServerSocketChannel 还未注册到 NioEventLoop 的 selector上, 此时理论上 ch.eventLoop() 应该是null？
                 ch.eventLoop().execute(new Runnable() {
                     @Override
                     public void run() {
