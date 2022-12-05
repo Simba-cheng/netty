@@ -564,15 +564,19 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                 registered = true;
 
                 // 触发 handlerAdded 事件
+                // 回调 pipeline 中添加的 ChannelInitializer 的 handlerAdded 方法，在这里初始化 channelPipeline。
                 pipeline.invokeHandlerAddedIfNeeded();
 
-                // 通知成功
+                // 设置 regFuture 为 success，
+                // 触发 operationComplete 回调,将 bind 操作放入 Reactor 的任务队列中，等待 Reactor 线程执行。
                 safeSetSuccess(promise);
 
                 // 触发 channelRegistered 事件
                 pipeline.fireChannelRegistered();
 
-                // 当前状态为活跃则触发 ChannelActive 事件（注册时不活跃，绑定端口后活跃）
+                // 对于服务端 ServerSocketChannel 来说 只有绑定端口地址成功后 channel 的状态才是 active 的,
+                // 此时绑定操作作为异步任务在 Reactor 的任务队列中，绑定操作还没开始，所以这里的 isActive() 是 false,
+                // 注册时不活跃，绑定端口后活跃
                 if (isActive()) {
                     if (firstRegistration) {
                         pipeline.fireChannelActive();
