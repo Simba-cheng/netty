@@ -558,16 +558,21 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                 }
                 boolean firstRegistration = neverRegistered;
 
-                // 实际执行
+                // 调用 JDK 层面的 register() 方法进行注册
                 doRegister();
                 neverRegistered = false;
                 registered = true;
 
+                // 触发 handlerAdded 事件
                 pipeline.invokeHandlerAddedIfNeeded();
 
                 // 通知成功
                 safeSetSuccess(promise);
+
+                // 触发 channelRegistered 事件
                 pipeline.fireChannelRegistered();
+
+                // 当前状态为活跃则触发 ChannelActive 事件（注册时不活跃，绑定端口后活跃）
                 if (isActive()) {
                     if (firstRegistration) {
                         pipeline.fireChannelActive();

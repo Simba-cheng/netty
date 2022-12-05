@@ -440,13 +440,9 @@ public abstract class AbstractNioChannel extends AbstractChannel {
                     则说明可能NIO的相关类库存在不可恢复的BUG,直接抛出 CancelledKeyException 异常到上层进行统一处理。
                  */
                 if (!selected) {
-                    // Force the Selector to select now as the "canceled" SelectionKey may still be
-                    // cached and not removed because no Select.select(..) operation was called yet.
                     eventLoop().selectNow();
                     selected = true;
                 } else {
-                    // We forced a select operation on the selector before but the SelectionKey is still cached
-                    // for whatever reason. JDK bug ?
                     throw e;
                 }
             }
