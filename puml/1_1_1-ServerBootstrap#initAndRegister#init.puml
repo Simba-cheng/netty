@@ -1,12 +1,42 @@
 @startuml
 
-AbstractBootstrap -> ServerBootstrap: init
+'箭头上的文字居中
+skinparam sequenceMessageAlign center
 
-ServerBootstrap -> ServerBootstrap: \n ① setChannelOptions
-ServerBootstrap -> ServerBootstrap: \n ② setAttributes
-ServerBootstrap -> ServerBootstrap: \n ③ add handler
-ServerBootstrap -> ServerBootstrap: \n ④ add ServerBootstrapAcceptor
+AbstractBootstrap -> ServerBootstrap: \n init 初始化 NioServerSocketChannel
 
-ServerBootstrap --> AbstractBootstrap: \n
+group init内部逻辑
+
+    ServerBootstrap -> AbstractBootstrap: \n ① setChannelOptions
+        note right
+            ①#
+            为 NioServerSocketChannel 配置TCP等参数
+            是由 serverBootstrap.option 方法添加的参数
+            @see io.netty.bootstrap.AbstractBootstrap.option
+        end note
+    AbstractBootstrap --> ServerBootstrap
+
+    ServerBootstrap -> AbstractBootstrap: \n ② setAttributes
+        note right
+            ②#
+            为 NioServerSocketChannel 配置自定义属性
+            是由 serverBootstrap.attr 方法添加的 自定义属性
+            @see io.netty.bootstrap.AbstractBootstrap.attr
+        end note
+    AbstractBootstrap --> ServerBootstrap
+
+    group 装配 NioServerSocketChannel 的 pipeline 流水线
+        ServerBootstrap -> ServerBootstrap: \n ③ add handler
+            note right
+                添加自定义handler
+                是由 serverBootstrap.handler 方法配置的
+                @see io.netty.bootstrap.AbstractBootstrap.handler
+            end note
+        ServerBootstrap -> ServerBootstrap: \n ④ add ServerBootstrapAcceptor
+    end
+
+    ServerBootstrap --> AbstractBootstrap: \n
+
+end
 
 @enduml
