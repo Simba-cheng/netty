@@ -1,0 +1,12 @@
+@startuml
+
+AbstractBootstrap -> ServerBootstrap: init
+
+ServerBootstrap -> ServerBootstrap: \n setChannelOptions
+ServerBootstrap -> ServerBootstrap: \n setAttributes
+ServerBootstrap -> ServerBootstrap: \n add handler
+ServerBootstrap -> ServerBootstrap: \n add ServerBootstrapAcceptor
+
+ServerBootstrap --> AbstractBootstrap: \n
+
+@enduml
