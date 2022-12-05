@@ -90,6 +90,8 @@ public abstract class MultithreadEventLoopGroup extends MultithreadEventExecutor
 
             如果从 AbstractBootstrap#initAndRegister#config().group().register 方法而来,
             是用于注册 parentGroup 中的 NioServerSocketChannel,由 serverBootstrap.channel 方法设置
+
+            register 的实现类 SingleThreadEventLoop
          */
         return next().register(channel);
     }
