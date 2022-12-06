@@ -564,7 +564,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                 registered = true;
 
                 // 触发 handlerAdded 事件
-                // 回调 pipeline 中添加的 ChannelInitializer 的 handlerAdded 方法，在这里初始化 channelPipeline。
+                // 回调 pipeline 中添加的 ChannelInitializer 的 handlerAdded 方法。
                 pipeline.invokeHandlerAddedIfNeeded();
 
                 // 设置 regFuture 为 success，
