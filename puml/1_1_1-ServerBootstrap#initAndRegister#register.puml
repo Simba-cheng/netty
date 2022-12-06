@@ -39,10 +39,12 @@ AbstractBootstrap -> MultithreadEventLoopGroup: \n register \n 注册 NioServerS
                 end note
 
                 AbstractChannel.AbstractUnsafe -> AbstractChannel.AbstractUnsafe: \n 触发 operationComplete 回调
-
                 AbstractChannel.AbstractUnsafe -> AbstractChannel.AbstractUnsafe: \n 触发 channelRegistered 事件
-
             end
+
+            AbstractChannel.AbstractUnsafe --> SingleThreadEventLoop: \n
+
+            SingleThreadEventLoop --> MultithreadEventLoopGroup: \n
 
     end
 
