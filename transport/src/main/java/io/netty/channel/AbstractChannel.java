@@ -615,8 +615,10 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                         "address (" + localAddress + ") anyway as requested.");
             }
 
+            // 绑定前 isActive() 为 false
             boolean wasActive = isActive();
             try {
+                // 调用 JDK 底层绑定
                 doBind(localAddress);
             } catch (Throwable t) {
                 safeSetFailure(promise, t);
@@ -624,10 +626,12 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                 return;
             }
 
+            // 绑定后 isActive() 为 true
             if (!wasActive && isActive()) {
                 invokeLater(new Runnable() {
                     @Override
                     public void run() {
+                        // 触发 ChannelActive 事件
                         pipeline.fireChannelActive();
                     }
                 });
