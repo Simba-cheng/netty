@@ -34,7 +34,7 @@ AbstractBootstrap -> AbstractBootstrap: \n ② doBind \n     核心业务逻辑
                         note right
                             ①#
                             为 NioServerSocketChannel 配置TCP等参数
-                            是由 serverBootstrap.option 方法添加的参数,@see io.netty.bootstrap.AbstractBootstrap.option
+                            是由 serverBootstrap.option 方法添加的参数, @see io.netty.bootstrap.AbstractBootstrap.option
                         end note
                     AbstractBootstrap --> ServerBootstrap:
 
@@ -42,20 +42,19 @@ AbstractBootstrap -> AbstractBootstrap: \n ② doBind \n     核心业务逻辑
                         note right
                             ②#
                             为 NioServerSocketChannel 配置自定义属性
-                            是由 serverBootstrap.attr 方法添加的 自定义属性,@see io.netty.bootstrap.AbstractBootstrap.attr
+                            是由 serverBootstrap.attr 方法添加的 自定义属性, @see io.netty.bootstrap.AbstractBootstrap.attr
                         end note
                     AbstractBootstrap --> ServerBootstrap
 
-                    group #ADD8E6 装配 pipeline 流水线(initChannel) [<color:#FF4500><size:14> 注意: 此处装配的 pipeline 在该 NioServerSocketChannel 注册完成后才会被调用!! </size></color>]
+                    group #EEE9E9 装配 pipeline 流水线(initChannel) [<color:#FF4500><size:14> 注意: 此处装配的 pipeline 在该 NioServerSocketChannel 注册完成后才会被调用!! </size></color>]
                         ServerBootstrap -> ServerBootstrap: \n ③ add handler
                             note right
                                 ③#
                                 添加自定义handler
-                                是由 serverBootstrap.handler 方法配置的
-                                @see io.netty.bootstrap.AbstractBootstrap.handler
+                                是由 serverBootstrap.handler 方法配置的 ,@see io.netty.bootstrap.AbstractBootstrap.handler
                             end note
 
-                        group #FFC1C1 Runnable 异步任务
+                        group #B0E2FF Runnable 异步任务
                             ServerBootstrap -> ServerBootstrap: \n ④ add ServerBootstrapAcceptor
                                 note right
                                     ④#
