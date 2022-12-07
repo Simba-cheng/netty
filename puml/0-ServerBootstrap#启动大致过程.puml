@@ -1,24 +1,83 @@
 @startuml
 
+'箭头上的文字居中
+'skinparam sequenceMessageAlign center
+
 Actor -> AbstractBootstrap: bind
 
 AbstractBootstrap -> AbstractBootstrap: \n ① validate \n     参数校验
 
 AbstractBootstrap -> AbstractBootstrap: \n ② doBind \n     核心业务逻辑
 
-'    group #FDF5E6 doBind
-'        AbstractBootstrap -> AbstractBootstrap: \n\n ⑴. initAndRegister
+    group ② doBind 内部逻辑
 
-'            group #F0FFF0 initAndRegister
-'                AbstractBootstrap -> ServerBootstrap: \n\n <size:16>❶</size> init
-'                ServerBootstrap --> AbstractBootstrap
-'
-'                AbstractBootstrap -> MultithreadEventLoopGroup: \n\n <size:16>❷</size> register
-'                MultithreadEventLoopGroup --> AbstractBootstrap
-'            end
+    AbstractBootstrap -> AbstractBootstrap: \n ⑴. initAndRegister
+        note right
+            通过反射创建 NioServerSocketChannel,然后对其初始化,
+            最后将 NioServerSocketChannel 注册到 NioEventLoop 的 Selector 上.
+        end note
+        group ⑴ initAndRegister 内部逻辑
 
-'        AbstractBootstrap -> AbstractBootstrap: \n\n ⑵. doBind0
+            AbstractBootstrap -> AbstractBootstrap: \n Ⓐ newChannel
+            note left
+                通过反射创建 NioServerSocketChannel
+            end note
 
-'    end
+            AbstractBootstrap -> ServerBootstrap: \n Ⓑ init
+            note left
+                初始化 NioServerSocketChannel
+            end note
+
+                group #F5FFFA Ⓑ init 初始化 NioServerSocketChannel
+
+                    ServerBootstrap -[#0000FF]> AbstractBootstrap: \n ① setChannelOptions
+                        note right
+                            ①#
+                            为 NioServerSocketChannel 配置TCP等参数
+                            是由 serverBootstrap.option 方法添加的参数,@see io.netty.bootstrap.AbstractBootstrap.option
+                        end note
+                    AbstractBootstrap --> ServerBootstrap:
+
+                    ServerBootstrap -[#0000FF]> AbstractBootstrap: \n ② setAttributes
+                        note right
+                            ②#
+                            为 NioServerSocketChannel 配置自定义属性
+                            是由 serverBootstrap.attr 方法添加的 自定义属性,@see io.netty.bootstrap.AbstractBootstrap.attr
+                        end note
+                    AbstractBootstrap --> ServerBootstrap
+
+                    group #ADD8E6 装配 pipeline 流水线(initChannel) [<color:#FF4500><size:14> 注意: 此处装配的 pipeline 在该 NioServerSocketChannel 注册完成后才会被调用!! </size></color>]
+                        ServerBootstrap -> ServerBootstrap: \n ③ add handler
+                            note right
+                                ③#
+                                添加自定义handler
+                                是由 serverBootstrap.handler 方法配置的
+                                @see io.netty.bootstrap.AbstractBootstrap.handler
+                            end note
+
+                        group #FFC1C1 Runnable 异步任务
+                            ServerBootstrap -> ServerBootstrap: \n ④ add ServerBootstrapAcceptor
+                                note right
+                                    ④#
+                                    向 NioServerSocketChannel 所属的 NioEventLoop 提交一个 Runnable 异步任务。
+                                    Runnable 作用就是在 NioServerSocketChannel 的 pipeline 中添加一个 ServerBootstrapAcceptor 处理器。
+                                end note
+                        end
+                    end
+                    ServerBootstrap --> AbstractBootstrap: \n
+                end
+
+            AbstractBootstrap -> AbstractBootstrap: \n Ⓒ register
+            note left
+                注册 NioServerSocketChannel
+            end note
+
+        end
+
+    AbstractBootstrap -> AbstractBootstrap: \n ⑵. doBind0
+
+    end
+
+AbstractBootstrap --> Actor : \n
 
 @enduml
