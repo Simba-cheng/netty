@@ -66,9 +66,7 @@ AbstractBootstrap -> AbstractBootstrap: \n ② doBind \n     核心业务逻辑
 
                         MultithreadEventLoopGroup -> MultithreadEventExecutorGroup: \n ① next
                         MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: chooser.next()
-                        note right
-                            通过 chooser(类似负载均衡器) 从 NioEventLoopGroup 中挑选一个 NioEventLoop,
-                        end note
+                        note right: 通过 chooser(类似负载均衡器) 从 NioEventLoopGroup 中挑选一个 NioEventLoop
                         MultithreadEventExecutorGroup --> MultithreadEventLoopGroup
 
 
