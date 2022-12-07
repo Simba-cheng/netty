@@ -11,70 +11,98 @@ AbstractBootstrap -> AbstractBootstrap: \n ② doBind \n     核心业务逻辑
 
     group ② doBind 内部逻辑
 
-    AbstractBootstrap -> AbstractBootstrap: \n ⑴. initAndRegister
-        note right
-            通过反射创建 NioServerSocketChannel,然后对其初始化,
-            最后将 NioServerSocketChannel 注册到 NioEventLoop 的 Selector 上.
-        end note
-        group ⑴ initAndRegister 内部逻辑
+        AbstractBootstrap -> AbstractBootstrap: \n ⑴. initAndRegister
+            group ⑴ initAndRegister 内部逻辑 [<color:#FF8247><size:13>创建 NioServerSocketChannel,然后对其初始化,再将其注册到 NioEventLoop 的 Selector 上.</size></color>]
 
-            AbstractBootstrap -> AbstractBootstrap: \n Ⓐ newChannel
-            note left
-                通过反射创建 NioServerSocketChannel
-            end note
+                AbstractBootstrap -> AbstractBootstrap: \n Ⓐ newChannel
+                note right: 通过反射创建 NioServerSocketChannel
 
-            AbstractBootstrap -> ServerBootstrap: \n Ⓑ init
-            note left
-                初始化 NioServerSocketChannel
-            end note
+                AbstractBootstrap -> ServerBootstrap: \n\n\n Ⓑ init
 
-                group #F5FFFA Ⓑ init 初始化 NioServerSocketChannel
+                    group #F5FFFA Ⓑ init 内部逻辑 [<color:#FF8247><size:14>初始化 NioServerSocketChannel</size></color>]
 
-                    ServerBootstrap -[#0000FF]> AbstractBootstrap: \n ① setChannelOptions
-                        note right
-                            ①#
-                            为 NioServerSocketChannel 配置TCP等参数
-                            是由 serverBootstrap.option 方法添加的参数, @see io.netty.bootstrap.AbstractBootstrap.option
-                        end note
-                    AbstractBootstrap --> ServerBootstrap:
-
-                    ServerBootstrap -[#0000FF]> AbstractBootstrap: \n ② setAttributes
-                        note right
-                            ②#
-                            为 NioServerSocketChannel 配置自定义属性
-                            是由 serverBootstrap.attr 方法添加的 自定义属性, @see io.netty.bootstrap.AbstractBootstrap.attr
-                        end note
-                    AbstractBootstrap --> ServerBootstrap
-
-                    group #EEE9E9 装配 pipeline 流水线(initChannel) [<color:#FF4500><size:14> 注意: 此处装配的 pipeline 在该 NioServerSocketChannel 注册完成后才会被调用!! </size></color>]
-                        ServerBootstrap -> ServerBootstrap: \n ③ add handler
+                        ServerBootstrap -[#0000FF]> AbstractBootstrap: \n\n\n\n\n ① setChannelOptions
                             note right
-                                ③#
-                                添加自定义handler
-                                是由 serverBootstrap.handler 方法配置的 ,@see io.netty.bootstrap.AbstractBootstrap.handler
+                                ①#
+                                为 NioServerSocketChannel 配置TCP等参数
+                                由 serverBootstrap.option 方法添加的参数,
+                                @see io.netty.bootstrap.AbstractBootstrap.option
                             end note
+                        AbstractBootstrap --> ServerBootstrap:
 
-                        group #B0E2FF Runnable 异步任务
-                            ServerBootstrap -> ServerBootstrap: \n ④ add ServerBootstrapAcceptor
+                        ServerBootstrap -[#0000FF]> AbstractBootstrap: \n\n\n\n\n ② setAttributes
+                            note right
+                                ②#
+                                为 NioServerSocketChannel 配置自定义属性
+                                由 serverBootstrap.attr 方法添加的 自定义属性,
+                                @see io.netty.bootstrap.AbstractBootstrap.attr
+                            end note
+                        AbstractBootstrap --> ServerBootstrap
+
+                        group #EEE9E9 装配 pipeline 流水线(initChannel) [<color:#FF4500><size:14> 注意: 此处装配的 pipeline 在该 NioServerSocketChannel 注册完成后才会被调用!! </size></color>]
+                            ServerBootstrap -> ServerBootstrap: \n ③ add handler
                                 note right
-                                    ④#
-                                    向 NioServerSocketChannel 所属的 NioEventLoop 提交一个 Runnable 异步任务。
-                                    Runnable 作用就是在 NioServerSocketChannel 的 pipeline 中添加一个 ServerBootstrapAcceptor 处理器。
+                                    ③#
+                                    添加自定义handler
+                                    由 serverBootstrap.handler 方法配置的,
+                                    @see io.netty.bootstrap.AbstractBootstrap.handler
                                 end note
+
+                            group #B0E2FF Runnable 异步任务
+                                ServerBootstrap -> ServerBootstrap: \n ④ add ServerBootstrapAcceptor
+                                    note right
+                                        ④#
+                                        向 NioServerSocketChannel 所属的 NioEventLoop 提交一个 Runnable 异步任务。
+                                        Runnable 作用就是在 NioServerSocketChannel 的 pipeline 中添加一个 ServerBootstrapAcceptor 处理器。
+                                    end note
+                            end
                         end
+                        ServerBootstrap --> AbstractBootstrap: \n
                     end
-                    ServerBootstrap --> AbstractBootstrap: \n
-                end
 
-            AbstractBootstrap -> AbstractBootstrap: \n Ⓒ register
-            note left
-                注册 NioServerSocketChannel
-            end note
+                AbstractBootstrap -> MultithreadEventLoopGroup: \n\n\n Ⓒ register
 
-        end
+                    group #F8F8FF Ⓒ register 内部逻辑 [<color:#FF8247><size:14>注册 NioServerSocketChannel</size></color>]
 
-    AbstractBootstrap -> AbstractBootstrap: \n ⑵. doBind0
+                        MultithreadEventLoopGroup -> MultithreadEventExecutorGroup: \n ① next
+                        MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: chooser.next()
+                        note right
+                            通过 chooser(类似负载均衡器) 从 NioEventLoopGroup 中挑选一个 NioEventLoop,
+                        end note
+                        MultithreadEventExecutorGroup --> MultithreadEventLoopGroup
 
+
+                        MultithreadEventLoopGroup -> SingleThreadEventLoop: \n ② register
+
+                        SingleThreadEventLoop -> SingleThreadEventLoop: \n create DefaultChannelPromise
+                        note right
+                            将 NioServerSocketChannel 和 NioEventLoop 包装成 DefaultChannelPromise
+                        end note
+
+                        SingleThreadEventLoop -> AbstractChannel.AbstractUnsafe: \n ③ register
+
+                        AbstractChannel.AbstractUnsafe -> AbstractChannel.AbstractUnsafe: \n ④ register0
+
+                            group #ADD8E6 ④ register0 内部逻辑
+                                AbstractChannel.AbstractUnsafe -> AbstractNioChannel: \n doRegister
+                                note right: 调用 JDK 层面的 register() 方法进行注册
+                                AbstractNioChannel --> AbstractChannel.AbstractUnsafe
+
+                                AbstractChannel.AbstractUnsafe -> AbstractChannel.AbstractUnsafe: \n 触发 handlerAdded 事件
+                                note left
+                                handlerAdded 回调会触发 pipeline 中添加的 ChannelInitializer 的 handlerAdded 方法，
+                                接着 ChannelInitializer 会先调用用户实现类的 initChannel 方法添加用户的 Handler，
+                                然后把自己(即:ChannelInitializer)从 pipeline 移出。
+                                end note
+                                AbstractChannel.AbstractUnsafe -> AbstractChannel.AbstractUnsafe: \n 触发 operationComplete 回调
+                                AbstractChannel.AbstractUnsafe -> AbstractChannel.AbstractUnsafe: \n 触发 channelRegistered 事件
+                            end
+                            AbstractChannel.AbstractUnsafe --> SingleThreadEventLoop: \n
+                            SingleThreadEventLoop --> MultithreadEventLoopGroup: \n
+                    end
+                MultithreadEventLoopGroup --> AbstractBootstrap: \n
+            end
+        AbstractBootstrap -> AbstractBootstrap: \n ⑵. doBind0
     end
 
 AbstractBootstrap --> Actor : \n
