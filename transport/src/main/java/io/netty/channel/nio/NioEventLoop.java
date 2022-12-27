@@ -579,13 +579,14 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                 selectCnt++;
                 cancelledKeys = 0;
                 needsToSelectAgain = false;
-                // ioRatio参数用于控制 I/O 事件处理和内部任务处理的时间比例，默认值为50
+                // ioRatio参数用于控制 I/O 事件处理和内部任务处理的时间比例，默认值为50,一半时间用来处理io事件,一半时间用来处理任务
                 // 如果 ioRatio = 100，表示每次处理完 I/O 事件后，会执行所有的 task
                 // 如果 ioRatio < 100，也会优先处理完 I/O 事件，再处理异步任务队列。
                 // 所以无论如何，processSelectedKeys() 都是先执行的。
                 final int ioRatio = this.ioRatio;
                 boolean ranTasks;
                 // 根据 ioRatio，选择 执行IO操作还是内部队列中的任务
+                // 100%表示执行完全部任务，才进入下一轮循环
                 if (ioRatio == 100) {
                     try {
                         if (strategy > 0) {
@@ -607,7 +608,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                         ranTasks = runAllTasks(ioTime * (100 - ioRatio) / ioRatio);
                     }
                 } else {
-                    // This will run the minimum number of tasks
+                    // 0表示运行运行最小数量的任务，即63个
                     ranTasks = runAllTasks(0);
                 }
 
@@ -946,7 +947,9 @@ public final class NioEventLoop extends SingleThreadEventLoop {
             // 调用底层 NIO Selector 的 select 方法
             return selector.select();
         }
-        // Timeout will only be 0 if deadline is within 5 microsecs
+
+        // 如果 deadlineNanos 小于5纳秒，则为0,否则取整为1毫秒
+        // 这段操作是为了向上取整，转成毫秒
         long timeoutMillis = deadlineToDelayNanos(deadlineNanos + 995000L) / 1000000L;
 
         /*
@@ -957,6 +960,8 @@ public final class NioEventLoop extends SingleThreadEventLoop {
             selector.selectNow() 是立即返回的，不会阻塞当前线程。
             selector.select() 是会阻塞当前线程的。
          */
+        // 如果timeoutMillis大于0，就阻塞selector同样的时间
+        // 这段是为了获取最近的延时任务
         return timeoutMillis <= 0 ? selector.selectNow() : selector.select(timeoutMillis);
     }
 

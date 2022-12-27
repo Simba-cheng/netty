@@ -325,12 +325,13 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
         }
         long nanoTime = getCurrentTimeNanos();
         for (;;) {
+            // 从 定时任务队列 中取出执行时间小于等于当前时间的任务
             Runnable scheduledTask = pollScheduledTask(nanoTime);
             if (scheduledTask == null) {
                 return true;
             }
             if (!taskQueue.offer(scheduledTask)) {
-                // No space left in the task queue add it back to the scheduledTaskQueue so we pick it up again.
+                // 任务队列中没有剩余空间，说明普通任务队列满了添加失败，把定时任务放回 scheduletaskqueue 以便再次提取它，然后退出
                 scheduledTaskQueue.add((ScheduledFutureTask<?>) scheduledTask);
                 return false;
             }
@@ -499,30 +500,33 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
      * the tasks in the task queue and returns if it ran longer than {@code timeoutNanos}.
      */
     protected boolean runAllTasks(long timeoutNanos) {
+        // 将 定时任务 合并到 普通任务队列中
         fetchFromScheduledTaskQueue();
+
+        // 处理任务
         Runnable task = pollTask();
         if (task == null) {
             afterRunningAllTasks();
             return false;
         }
 
+        // 计算 runAllTasks 的超时时间
         final long deadline = timeoutNanos > 0 ? getCurrentTimeNanos() + timeoutNanos : 0;
         long runTasks = 0;
         long lastExecutionTime;
+        // 死循环执行
         for (;;) {
+            // 执行任务
             safeExecute(task);
-
             runTasks ++;
-
-            // Check timeout every 64 tasks because nanoTime() is relatively expensive.
-            // XXX: Hard-coded value - will make it configurable if it is really a problem.
+            // 每执行64个任务就检查下是否超时,超时后不再继续执行
             if ((runTasks & 0x3F) == 0) {
                 lastExecutionTime = getCurrentTimeNanos();
                 if (lastExecutionTime >= deadline) {
                     break;
                 }
             }
-
+            // 从普通任务队列中取出下一个任务
             task = pollTask();
             if (task == null) {
                 lastExecutionTime = getCurrentTimeNanos();
@@ -996,12 +1000,13 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
     private static final long SCHEDULE_PURGE_INTERVAL = TimeUnit.SECONDS.toNanos(1);
 
     private void startThread() {
+        // 确保 doStartThread 方法只会执行一次。
         if (state == ST_NOT_STARTED) {
             // CAS操作，以非阻塞的线程安全方式更新
             if (STATE_UPDATER.compareAndSet(this, ST_NOT_STARTED, ST_STARTED)) {
                 boolean success = false;
                 try {
-                    // 启动内部线程
+                    // 实际启动内部线程
                     doStartThread();
                     success = true;
                 } finally {

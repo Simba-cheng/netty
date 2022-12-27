@@ -142,22 +142,21 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
 
     /**
      * 初始化 channel
+     *
      * @param channel NioServerSocketChannel,由 serverBootstrap.channel 方法设置
      */
     @Override
     void init(Channel channel) {
         /*
             为 NioServerSocketChannel 配置TCP等参数
-
-            newOptionsArray()方法返回的就是 由 serverBootstrap.option 方法添加的参数
+            newOptionsArray 方法返回的就是由 serverBootstrap.option 方法添加的参数
             @see io.netty.bootstrap.AbstractBootstrap.option
          */
         setChannelOptions(channel, newOptionsArray(), logger);
 
         /*
             为 NioServerSocketChannel 配置自定义属性
-
-            newAttributesArray()方法返回的就是 由 serverBootstrap.attr 方法添加的 自定义属性
+            newAttributesArray 方法返回的就是由 serverBootstrap.attr 方法添加的 自定义属性
             @see io.netty.bootstrap.AbstractBootstrap.attr
          */
         setAttributes(channel, newAttributesArray());
@@ -174,27 +173,38 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         final Entry<AttributeKey<?>, Object>[] currentChildAttrs = newAttributesArray(childAttrs);
 
         /*
-            装配 pipeline 流水线
+            装配 NioServerSocketChannel 的 pipeline 流水线
 
             ChannelInitializer 一次性、初始化handler
                 它会添加 ServerBootstrapAcceptor handler,添加完成后自己就移除了。
                 ServerBootstrapAcceptor handler 负责与客户端建立连接
          */
         p.addLast(new ChannelInitializer<Channel>() {
+            // remind initChannel 方法会在该 ServerSocketChannel 注册完成后被调用
             @Override
             public void initChannel(final Channel ch) {
-                // 注意：这里的ch和上面的channel是同一个对象,即:NioServerSocketChannel
+                // 注意：这里的 ch 和上面的 channel 是同一个对象,即: NioServerSocketChannel
 
                 // 从 NioServerSocketChannel 中取出 pipeline
                 final ChannelPipeline pipeline = ch.pipeline();
 
-                // 将由 serverBootstrap.handler 配置的handler,添加到 NioServerSocketChannel 的 pipeline 中。
+                /*
+                    为 NioServerSocketChannel 的 pipeline 添加 handler
+                    config.handler 方法返回的 handler 就是由 serverBootstrap.handler 方法配置的
+                    @see io.netty.bootstrap.AbstractBootstrap.handler
+                 */
                 ChannelHandler handler = config.handler();
                 if (handler != null) {
                     pipeline.addLast(handler);
                 }
 
-                // 向 NioServerSocketChannel(AbstractNioChannel) 所属的 EventLoop 提交一个异步任务
+                /*
+                    在之前还有疑问,此时 NioServerSocketChannel 还未注册到 NioEventLoop 的 selector上, 此时理论上 ch.eventLoop() 应该是null？
+                    remind initChannel 方法会在该 ServerSocketChannel 注册完成后被调用
+                 */
+
+                // 向 NioServerSocketChannel 所属的 NioEventLoop 提交一个异步任务
+                // ch.eventLoop() 进入 AbstractNioChannel 类的实现方法
                 ch.eventLoop().execute(new Runnable() {
                     @Override
                     public void run() {

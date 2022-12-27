@@ -57,7 +57,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     private static final Map.Entry<AttributeKey<?>, Object>[] EMPTY_ATTRIBUTE_ARRAY = new Map.Entry[0];
 
     /**
-     * parentGroup 用于监听客户端连接,专门负责与客户端创建连接
+     * parentGroup 用于监听客户端连接,专门负责与 client 建立连接
      */
     volatile EventLoopGroup group;
 
@@ -284,7 +284,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     private ChannelFuture doBind(final SocketAddress localAddress) {
 
         /*
-            创建、初始化、注册 channel
+            MARK 创建、初始化、注册 channel
 
             1. 创建 serverSocketChannel
             2. 初始化
@@ -321,12 +321,8 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
                 public void operationComplete(ChannelFuture future) throws Exception {
                     Throwable cause = future.cause();
                     if (cause != null) {
-                        // Registration on the EventLoop failed so fail the ChannelPromise directly to not cause an
-                        // IllegalStateException once we try to access the EventLoop of the Channel.
                         promise.setFailure(cause);
                     } else {
-                        // Registration was successful, so set the correct executor to use.
-                        // See https://github.com/netty/netty/issues/2586
                         promise.registered();
                         // 绑定端口
                         doBind0(regFuture, channel, localAddress, promise);
@@ -349,12 +345,9 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
 
         } catch (Throwable t) {
             if (channel != null) {
-                // channel can be null if newChannel crashed (eg SocketException("too many open files"))
                 channel.unsafe().closeForcibly();
-                // as the Channel is not registered yet we need to force the usage of the GlobalEventExecutor
                 return new DefaultChannelPromise(channel, GlobalEventExecutor.INSTANCE).setFailure(t);
             }
-            // as the Channel is not registered yet we need to force the usage of the GlobalEventExecutor
             return new DefaultChannelPromise(new FailedChannel(), GlobalEventExecutor.INSTANCE).setFailure(t);
         }
 
@@ -367,7 +360,8 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
 
            因此这里可以理解为: 将 NioServerSocketChannel 注册到 parentGroup 中.
 
-           config().group(): 返回的是 parentGroup ,即:用于监听客户端连接,专门负责与客户端创建连接.
+           config().group(): 返回的是 parentGroup ,即:用于监听客户端连接,专门负责与客户端创建连接,
+           因此实现类是 MultithreadEventLoopGroup
          */
         ChannelFuture regFuture = config().group().register(channel);
         if (regFuture.cause() != null) {
@@ -377,16 +371,6 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
                 channel.unsafe().closeForcibly();
             }
         }
-
-        // If we are here and the promise is not failed, it's one of the following cases:
-        // 1) If we attempted registration from the event loop, the registration has been completed at this point.
-        //    i.e. It's safe to attempt bind() or connect() now because the channel has been registered.
-        // 2) If we attempted registration from the other thread, the registration request has been successfully
-        //    added to the event loop's task queue for later execution.
-        //    i.e. It's safe to attempt bind() or connect() now:
-        //         because bind() or connect() will be executed *after* the scheduled registration task is executed
-        //         because register(), bind(), and connect() are all bound to the same thread.
-
         return regFuture;
     }
 
@@ -396,11 +380,12 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
             final ChannelFuture regFuture, final Channel channel,
             final SocketAddress localAddress, final ChannelPromise promise) {
 
-        // 向ServerSocketChannel所属的EventLoop中提交一个异步任务
+        // 向 ServerSocketChannel 所属的 EventLoop 中提交一个异步任务
 
         /*
             在channelRegistered()被触发之前调用此方法。让用户处理程序有机会在其channelRegistered()实现中设置管道。
             此处的channel,对于 ServerBootstrap 来说,一般是 NioServerSocketChannel,channel具体类型,是由 serverBootstrap.channel 方法设置的。
+            实现类 SingleThreadEventExecutor#execute(java.lang.Runnable)
          */
         channel.eventLoop().execute(new Runnable() {
             @Override

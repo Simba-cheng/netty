@@ -1,0 +1,13 @@
+@startuml
+
+Actor -> AbstractBootstrap: initAndRegister
+
+AbstractBootstrap -> AbstractBootstrap: \n ① newChannel \n     创建 Channel
+
+AbstractBootstrap -> AbstractBootstrap: \n ② init \n     初始化 Channel
+
+AbstractBootstrap -> AbstractBootstrap: \n ③ register \n     注册 Channel
+
+AbstractBootstrap --> Actor: \n
+
+@enduml

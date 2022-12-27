@@ -528,7 +528,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             } else {
                 try {
                     /*
-                        对于 NioEventLoop 创建内部工作线程来说,重点方法是: eventLoop.execute(...)
+                        对于 NioEventLoop 启动内部工作线程来说,重点方法是: eventLoop.execute(...)
                      */
                     eventLoop.execute(new Runnable() {
                         @Override
@@ -553,40 +553,38 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
          */
         private void register0(ChannelPromise promise) {
             try {
-                // check if the channel is still open as it could be closed in the mean time when the register
-                // call was outside of the eventLoop
                 if (!promise.setUncancellable() || !ensureOpen(promise)) {
                     return;
                 }
                 boolean firstRegistration = neverRegistered;
 
-                // 实际执行
+                // 调用 JDK 层面的 register() 方法进行注册
                 doRegister();
                 neverRegistered = false;
                 registered = true;
 
-                // Ensure we call handlerAdded(...) before we actually notify the promise. This is needed as the
-                // user may already fire events through the pipeline in the ChannelFutureListener.
+                // 触发 handlerAdded 事件
+                // 回调 pipeline 中添加的 ChannelInitializer 的 handlerAdded 方法。
                 pipeline.invokeHandlerAddedIfNeeded();
 
-                // 通知成功
+                // 设置 regFuture 为 success，
+                // 触发 operationComplete 回调,将 bind 操作放入 Reactor 的任务队列中，等待 Reactor 线程执行。
                 safeSetSuccess(promise);
+
+                // 触发 channelRegistered 事件
                 pipeline.fireChannelRegistered();
-                // Only fire a channelActive if the channel has never been registered. This prevents firing
-                // multiple channel actives if the channel is deregistered and re-registered.
+
+                // 对于服务端 ServerSocketChannel 来说 只有绑定端口地址成功后 channel 的状态才是 active 的,
+                // 此时绑定操作作为异步任务在 Reactor 的任务队列中，绑定操作还没开始，所以这里的 isActive() 是 false,
+                // 注册时不活跃，绑定端口后活跃
                 if (isActive()) {
                     if (firstRegistration) {
                         pipeline.fireChannelActive();
                     } else if (config().isAutoRead()) {
-                        // This channel was registered before and autoRead() is set. This means we need to begin read
-                        // again so that we process inbound data.
-                        //
-                        // See https://github.com/netty/netty/issues/4805
                         beginRead();
                     }
                 }
             } catch (Throwable t) {
-                // Close the channel directly to avoid FD leak.
                 closeForcibly();
                 closeFuture.setClosed();
                 safeSetFailure(promise, t);
@@ -617,8 +615,10 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                         "address (" + localAddress + ") anyway as requested.");
             }
 
+            // 绑定前 isActive() 为 false
             boolean wasActive = isActive();
             try {
+                // 调用 JDK 底层绑定
                 doBind(localAddress);
             } catch (Throwable t) {
                 safeSetFailure(promise, t);
@@ -626,10 +626,12 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                 return;
             }
 
+            // 绑定后 isActive() 为 true
             if (!wasActive && isActive()) {
                 invokeLater(new Runnable() {
                     @Override
                     public void run() {
+                        // 触发 ChannelActive 事件
                         pipeline.fireChannelActive();
                     }
                 });

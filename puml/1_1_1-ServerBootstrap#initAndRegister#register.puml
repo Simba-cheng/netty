@@ -1,0 +1,53 @@
+@startuml
+
+'箭头上的文字居中
+skinparam sequenceMessageAlign center
+
+AbstractBootstrap -> MultithreadEventLoopGroup: \n register \n 注册 NioServerSocketChannel
+
+    group register 内部逻辑
+
+        MultithreadEventLoopGroup -> MultithreadEventExecutorGroup: \n ① next
+        MultithreadEventExecutorGroup -> MultithreadEventExecutorGroup: chooser.next()
+        note right
+            通过 chooser(类似负载均衡器) 从 NioEventLoopGroup 中挑选一个 NioEventLoop,
+        end note
+        MultithreadEventExecutorGroup --> MultithreadEventLoopGroup
+
+
+        MultithreadEventLoopGroup -> SingleThreadEventLoop: \n ② register
+
+        SingleThreadEventLoop -> SingleThreadEventLoop: \n create DefaultChannelPromise
+        note right
+            将 NioServerSocketChannel 和 NioEventLoop 包装成 DefaultChannelPromise
+        end note
+
+        SingleThreadEventLoop -> AbstractChannel.AbstractUnsafe: \n ③ register
+
+        AbstractChannel.AbstractUnsafe -> AbstractChannel.AbstractUnsafe: \n ④ register0
+
+            group #ADD8E6 ④ register0 内部逻辑
+                AbstractChannel.AbstractUnsafe -> AbstractNioChannel: \n doRegister
+                note right: 调用 JDK 层面的 register() 方法进行注册
+                AbstractNioChannel --> AbstractChannel.AbstractUnsafe
+
+                AbstractChannel.AbstractUnsafe -> AbstractChannel.AbstractUnsafe: \n 触发 handlerAdded 事件
+                note left
+                handlerAdded 回调会触发 pipeline 中添加的 ChannelInitializer 的 handlerAdded 方法，
+                接着 ChannelInitializer 会先调用用户实现类的 initChannel 方法添加用户的 Handler，
+                然后把自己(即:ChannelInitializer)从 pipeline 移出。
+                end note
+
+                AbstractChannel.AbstractUnsafe -> AbstractChannel.AbstractUnsafe: \n 触发 operationComplete 回调
+                AbstractChannel.AbstractUnsafe -> AbstractChannel.AbstractUnsafe: \n 触发 channelRegistered 事件
+            end
+
+            AbstractChannel.AbstractUnsafe --> SingleThreadEventLoop: \n
+
+            SingleThreadEventLoop --> MultithreadEventLoopGroup: \n
+
+    end
+
+MultithreadEventLoopGroup --> AbstractBootstrap: \n
+
+@enduml
