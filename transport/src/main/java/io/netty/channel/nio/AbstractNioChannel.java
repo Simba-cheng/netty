@@ -412,7 +412,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
         for (;;) {
             try {
                 /*
-                    调用 SelectableChannel 的 register 方法,将当前 Channel 注册到 EventLoop 的多路复用器上
+                    调用 SelectableChannel 的 register 方法,将当前 Channel(NioServerSocketChannel) 注册到 EventLoop 的多路复用器上
 
                     注册 Channel 的时候需要指定监听的网络操作位来表示 Channel 对哪几类网络事件感兴趣,定义如下:
                         读           public static final int OP_READ = 1 << 0;
@@ -436,7 +436,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
                     操作成功之后,将 selected 置为true,说明之前失效的 selectionKey 已经被删除掉。
 
                     继续发起下一次注册操作,如果成功则退出,如果仍然发生 CancelledKeyException 异常,
-                    说明我们无法删除已经被取消的 selectionKey ,按照JDK的API说明,这种意外不应该发生。如果发生这种问题,
+                    说明无法删除已经被取消的 selectionKey ,按照JDK的API说明,这种意外不应该发生。如果发生这种问题,
                     则说明可能NIO的相关类库存在不可恢复的BUG,直接抛出 CancelledKeyException 异常到上层进行统一处理。
                  */
                 if (!selected) {
