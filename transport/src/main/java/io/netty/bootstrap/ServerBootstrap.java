@@ -301,10 +301,6 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
                     将已建立链接的 socketChannel(nioSocketChannel) 注册到 childGroup,
 
                     childGroup: 用于处理每一个已建立连接发生的I/O读写事件的线程池
-
-                    childGroup 是如何从内部取出一个 child(eventLoop),与已建立链接的 socketChannel 绑定的?
-                        其内部使用选择器(chooser),用于选择一个内部的 EventLoop.
-                        源码位于: io.netty.util.concurrent.MultithreadEventExecutorGroup.next
                  */
                 // MultithreadEventLoopGroup.register(io.netty.channel.Channel)
                 childGroup.register(child).addListener(new ChannelFutureListener() {
