@@ -40,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * {@link Bootstrap} sub-class which allows easy bootstrap of {@link ServerChannel}
- *
  */
 public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerChannel> {
 
@@ -58,7 +57,8 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
     private volatile EventLoopGroup childGroup;
     private volatile ChannelHandler childHandler;
 
-    public ServerBootstrap() { }
+    public ServerBootstrap() {
+    }
 
     private ServerBootstrap(ServerBootstrap bootstrap) {
         super(bootstrap);
@@ -200,7 +200,8 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
 
                 /*
                     在之前还有疑问,此时 NioServerSocketChannel 还未注册到 NioEventLoop 的 selector上, 此时理论上 ch.eventLoop() 应该是null？
-                    remind initChannel 方法会在该 ServerSocketChannel 注册完成后被调用
+                    remind ChannelInitializer#initChannel 方法会在 NioServerSocketChannel 注册完成后,
+                     通过 handlerAdded事件 被调用,到那时已经注册好了
                  */
 
                 // 向 NioServerSocketChannel 所属的 NioEventLoop 提交一个异步任务
