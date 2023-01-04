@@ -133,6 +133,9 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
             }
         }
 
+        /**
+         * OP_READ 触发此方法
+         */
         @Override
         public final void read() {
             final ChannelConfig config = config();
