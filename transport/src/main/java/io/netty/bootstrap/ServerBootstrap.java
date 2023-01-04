@@ -180,7 +180,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
                 ServerBootstrapAcceptor handler 负责与客户端建立连接
          */
         p.addLast(new ChannelInitializer<Channel>() {
-            // remind initChannel 方法会在该 ServerSocketChannel 注册完成后被调用
+            // remind initChannel 方法会在 NioServerSocketChannel 注册完成后,通过 handlerAdded事件 被调用
             @Override
             public void initChannel(final Channel ch) {
                 // 注意：这里的 ch 和上面的 channel 是同一个对象,即: NioServerSocketChannel
