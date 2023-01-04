@@ -285,21 +285,21 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         @Override
         @SuppressWarnings("unchecked")
         public void channelRead(ChannelHandlerContext ctx, Object msg) {
-            // 此处的 msg,是已建立链接的 socketChannel(nioSocketChannel),因此可以直接强转
+            // 此处的 msg,是已建立链接的 NioSocketChannel,因此可以直接强转
             final Channel child = (Channel) msg;
 
-            // 将 childHandler 添加到 已建立连接的 socketChannel(nioSocketChannel) 的 pipeline 中。
+            // 将 childHandler 添加到 已建立连接的 NioSocketChannel 的 pipeline 中。
             child.pipeline().addLast(childHandler);
 
-            // 将 childOptions 添加到 已建立连接的 socketChannel(nioSocketChannel) 中
+            // 将 childOptions 添加到 已建立连接的 NioSocketChannel 中
             setChannelOptions(child, childOptions, logger);
 
-            // 将 childAttrs 添加到 已建立连接的 socketChannel(nioSocketChannel) 中
+            // 将 childAttrs 添加到 已建立连接的 NioSocketChannel 中
             setAttributes(child, childAttrs);
 
             try {
                 /*
-                    将已建立链接的 socketChannel(nioSocketChannel) 注册到 childGroup,
+                    将已建立链接的 NioSocketChannel 注册到 childGroup,
 
                     childGroup: 用于处理每一个已建立连接发生的I/O读写事件的线程池
                  */
