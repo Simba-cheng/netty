@@ -63,6 +63,9 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
 
         private final List<Object> readBuf = new ArrayList<Object>();
 
+        /**
+         * OP_ACCEPT 事件触发此方法
+         */
         @Override
         public void read() {
             assert eventLoop().inEventLoop();
