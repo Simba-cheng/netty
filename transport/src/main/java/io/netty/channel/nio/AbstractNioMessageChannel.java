@@ -121,7 +121,7 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
                 }
 
                 if (closed) {
-                    //如果需要关闭，那就关闭
+                    // 如果需要关闭，那就关闭
 
                     inputShutdown = true;
                     if (isOpen()) {
