@@ -39,6 +39,7 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
 
     @Override
     protected AbstractNioUnsafe newUnsafe() {
+        // 关注 OP_ACCEPT 事件,对应 NioServerSocketChannel
         return new NioMessageUnsafe();
     }
 
