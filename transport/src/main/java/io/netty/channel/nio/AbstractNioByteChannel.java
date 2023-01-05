@@ -79,6 +79,7 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
 
     @Override
     protected AbstractNioUnsafe newUnsafe() {
+        // 关注 OP_READ 事件, 对应 NioSocketChannel
         return new NioByteUnsafe();
     }
 
