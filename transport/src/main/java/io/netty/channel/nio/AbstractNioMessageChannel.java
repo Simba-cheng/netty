@@ -15,12 +15,7 @@
  */
 package io.netty.channel.nio;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelConfig;
-import io.netty.channel.ChannelOutboundBuffer;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.RecvByteBufAllocator;
-import io.netty.channel.ServerChannel;
+import io.netty.channel.*;
 
 import java.io.IOException;
 import java.net.PortUnreachableException;
@@ -64,13 +59,17 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
         private final List<Object> readBuf = new ArrayList<Object>();
 
         /**
-         * OP_ACCEPT 事件触发此方法
+         * NioEventLoop.processSelectedKey() 当 NioServerSocketChannel 有 OP_READ | OP_ACCEPT 事件时调用该方法。
+         * <p>
+         * 对于 NioServerSocketChannel 来说，它的<b>读</b> 实际上是 <u><b>读连接(accept)</b></u>，
          */
         @Override
         public void read() {
             assert eventLoop().inEventLoop();
             final ChannelConfig config = config();
             final ChannelPipeline pipeline = pipeline();
+
+            // 接收对端数据时，ByteBuf的分配策略，基于历史数据动态调整初始化大小，避免太大浪费空间，太小又会频繁扩容
             final RecvByteBufAllocator.Handle allocHandle = unsafe().recvBufAllocHandle();
             allocHandle.reset(config);
 
@@ -79,6 +78,7 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
             try {
                 try {
                     do {
+                        // 对于 NioServerSocketChannel 来说，就是接收一个客户端 Channel，添加到 readBuf。
                         int localRead = doReadMessages(readBuf);
                         if (localRead == 0) {
                             break;
@@ -88,6 +88,7 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
                             break;
                         }
 
+                        // 递增已读取的消息数量
                         allocHandle.incMessagesRead(localRead);
                     } while (continueReading(allocHandle));
                 } catch (Throwable t) {
@@ -95,21 +96,33 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
                 }
 
                 int size = readBuf.size();
-                for (int i = 0; i < size; i ++) {
+                for (int i = 0; i < size; i++) {
                     readPending = false;
+                    /**
+                     * 通过pipeline传播ChannelRead事件
+                     * {@link io.netty.bootstrap.ServerBootstrap.ServerBootstrapAcceptor#channelRead}
+                     */
                     pipeline.fireChannelRead(readBuf.get(i));
                 }
                 readBuf.clear();
+                // 读取完毕的回调，有的Handle会根据本次读取的总字节数，自适应调整下次应该分配的缓冲区大小
                 allocHandle.readComplete();
+                // 通过pipeline传播ChannelReadComplete事件
                 pipeline.fireChannelReadComplete();
 
                 if (exception != null) {
+                    // 事件处理异常了
+
+                    // 是否需要关闭连接
                     closed = closeOnReadError(exception);
 
+                    // 通过pipeline传播异常事件
                     pipeline.fireExceptionCaught(exception);
                 }
 
                 if (closed) {
+                    //如果需要关闭，那就关闭
+
                     inputShutdown = true;
                     if (isOpen()) {
                         close(voidPromise());
