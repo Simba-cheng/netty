@@ -177,6 +177,7 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
                     // 更新读取消息计数器
                     allocHandle.incMessagesRead(1);
                     readPending = false;
+
                     // 通知通道处理器处理数据，触发 Channel 通道的 fireChannelRead 事件
                     pipeline.fireChannelRead(byteBuf);
                     byteBuf = null;
@@ -237,7 +238,6 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
             // 实际发送字节数据
             final int localFlushedAmount = doWriteBytes(buf);
             if (localFlushedAmount > 0) {
-                // 更新字节数据的发送进度
                 in.progress(localFlushedAmount);
                 if (!buf.isReadable()) {
                     // 若可读字节数为0，则从缓存区中移除
