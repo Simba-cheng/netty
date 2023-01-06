@@ -153,9 +153,11 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
     @Override
     protected void doWrite(ChannelOutboundBuffer in) throws Exception {
         final SelectionKey key = selectionKey();
+        // 获取 Key 的兴趣集
         final int interestOps = key.interestOps();
 
         int maxMessagesPerWrite = maxMessagesPerWrite();
+        // 当前校验最大写的次数是否大于0
         while (maxMessagesPerWrite > 0) {
 
             // 从 ChannelOutboundBuffer 中弹出一条消息进行处理
@@ -166,13 +168,16 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
             }
             try {
                 boolean done = false;
+                //获取配置中，循环写的最大次数
                 for (int i = config().getWriteSpinCount() - 1; i >= 0; i--) {
+                    // 调用子方法进行循环写操作，成功返回true
                     if (doWriteMessage(msg, in)) {
                         done = true;
                         break;
                     }
                 }
 
+                // 若发送成功，则将其从缓存链表中移除，继续发送循环获取下一个数据
                 if (done) {
                     maxMessagesPerWrite--;
                     in.remove();
@@ -180,6 +185,7 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
                     break;
                 }
             } catch (Exception e) {
+                // 判断如果遇到异常是否要继续写
                 if (continueOnWriteError()) {
                     maxMessagesPerWrite--;
                     in.remove(e);
@@ -189,12 +195,12 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
             }
         }
         if (in.isEmpty()) {
-            // Wrote all messages.
+            // 数据已全部发送发送完成，从兴趣集中移除 OP_WRITE 事件
             if ((interestOps & SelectionKey.OP_WRITE) != 0) {
                 key.interestOps(interestOps & ~SelectionKey.OP_WRITE);
             }
         } else {
-            // Did not write all messages.
+            // 如果数据还没写完，将OP_WRITE加入到兴趣集中
             if ((interestOps & SelectionKey.OP_WRITE) == 0) {
                 key.interestOps(interestOps | SelectionKey.OP_WRITE);
             }
