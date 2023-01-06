@@ -222,26 +222,32 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
     private int doWriteInternal(ChannelOutboundBuffer in, Object msg) throws Exception {
         if (msg instanceof ByteBuf) {
             ByteBuf buf = (ByteBuf) msg;
+            // 若可读字节数为0，则从缓存区中移除
             if (!buf.isReadable()) {
                 in.remove();
                 return 0;
             }
 
+            // 实际发送字节数据
             final int localFlushedAmount = doWriteBytes(buf);
             if (localFlushedAmount > 0) {
+                // 更新字节数据的发送进度
                 in.progress(localFlushedAmount);
                 if (!buf.isReadable()) {
+                    // 若可读字节数为0，则从缓存区中移除
                     in.remove();
                 }
                 return 1;
             }
         } else if (msg instanceof FileRegion) {
+            // 如果是文件FileRegion消息
             FileRegion region = (FileRegion) msg;
             if (region.transferred() >= region.count()) {
                 in.remove();
                 return 0;
             }
 
+            // 实际写操作
             long localFlushedAmount = doWriteFileRegion(region);
             if (localFlushedAmount > 0) {
                 in.progress(localFlushedAmount);
@@ -303,15 +309,12 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
     protected final void incompleteWrite(boolean setOpWrite) {
         // Did not write completely.
         if (setOpWrite) {
+            // 将OP_WRITE写操作事件添加到Channel的选择Key兴趣事件集中
             setOpWrite();
         } else {
-            // It is possible that we have set the write OP, woken up by NIO because the socket is writable, and then
-            // use our write quantum. In this case we no longer want to set the write OP because the socket is still
-            // writable (as far as we know). We will find out next time we attempt to write if the socket is writable
-            // and set the write OP if necessary.
+            // 清除Channel选择Key兴趣事件集中的OP_WRITE写操作事件
             clearOpWrite();
-
-            // Schedule flush again later so other tasks can be picked up in the meantime
+            // 将写操作任务添加到EventLoop线程上，以便后续继续发送
             eventLoop().execute(flushTask);
         }
     }
