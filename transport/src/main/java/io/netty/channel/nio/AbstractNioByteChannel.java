@@ -139,56 +139,62 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
          */
         @Override
         public final void read() {
+            // 获取 pipeline 通道配置、channel 管道
             final ChannelConfig config = config();
+            // socketChannel 已经关闭
             if (shouldBreakReadReady(config)) {
                 clearReadPending();
                 return;
             }
             final ChannelPipeline pipeline = pipeline();
+            // 获取内容分配器，默认为 PooledByteBufAllocator
             final ByteBufAllocator allocator = config.getAllocator();
             final RecvByteBufAllocator.Handle allocHandle = recvBufAllocHandle();
+            // 清空上一次读取的字节数，每次读取时均重新计算
+            // 字节Buf分配器，并计算字节buf分配器 Handler
             allocHandle.reset(config);
 
             ByteBuf byteBuf = null;
             boolean close = false;
             try {
                 do {
+                    // 分配内存
                     byteBuf = allocHandle.allocate(allocator);
+                    // 读取通道接收缓冲区的数据
                     allocHandle.lastBytesRead(doReadBytes(byteBuf));
                     if (allocHandle.lastBytesRead() <= 0) {
-                        // nothing was read. release the buffer.
+                        // 若没有数据可以读，则释放内存
                         byteBuf.release();
                         byteBuf = null;
                         close = allocHandle.lastBytesRead() < 0;
                         if (close) {
-                            // There is nothing left to read as we received an EOF.
+                            // 当读到-1时，表示Channel通道已经关闭，没有必要再继续读。
                             readPending = false;
                         }
                         break;
                     }
 
+                    // 更新读取消息计数器
                     allocHandle.incMessagesRead(1);
                     readPending = false;
+                    // 通知通道处理器处理数据，触发 Channel 通道的 fireChannelRead 事件
                     pipeline.fireChannelRead(byteBuf);
                     byteBuf = null;
                 } while (allocHandle.continueReading());
 
+                // 读取操作完毕
                 allocHandle.readComplete();
                 pipeline.fireChannelReadComplete();
 
                 if (close) {
+                    // 如果Socket通道关闭，则关闭读操作
                     closeOnRead(pipeline);
                 }
             } catch (Throwable t) {
                 handleReadException(pipeline, byteBuf, t, close, allocHandle);
             } finally {
-                // Check if there is a readPending which was not processed yet.
-                // This could be for two reasons:
-                // * The user called Channel.read() or ChannelHandlerContext.read() in channelRead(...) method
-                // * The user called Channel.read() or ChannelHandlerContext.read() in channelReadComplete(...) method
-                //
-                // See https://github.com/netty/netty/issues/2254
                 if (!readPending && !config.isAutoRead()) {
+                    // 若读操作完毕，且没有配置自动读，则选择Key兴趣集中移除读操作事件。
                     removeReadOp();
                 }
             }
