@@ -948,6 +948,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
     private int select(long deadlineNanos) throws IOException {
         if (deadlineNanos == NONE) {
             // 调用底层 NIO Selector 的 select 方法
+            // 返回就绪 IO 事件的个数
             return selector.select();
         }
 
