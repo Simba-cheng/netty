@@ -97,6 +97,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
      */
     protected AbstractNioChannel(Channel parent, SelectableChannel ch, int readInterestOp) {
         super(parent);
+        // java.nio.channels.ServerSocketChannel
         this.ch = ch;
         this.readInterestOp = readInterestOp;
         try {
