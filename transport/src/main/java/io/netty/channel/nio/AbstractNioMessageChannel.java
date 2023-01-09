@@ -60,14 +60,11 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
         private final List<Object> readBuf = new ArrayList<Object>();
 
         /**
-         * NioEventLoop.processSelectedKey() 当 NioServerSocketChannel 有 OP_READ | OP_ACCEPT 事件时调用该方法。
-         * <p>
-         * 对于 NioServerSocketChannel 来说，它的<b>读</b> 实际上是 <u><b>读连接(accept)</b></u>，
+         * OP_ACCEPT
          */
         @Override
         public void read() {
             assert eventLoop().inEventLoop();
-            // 获取Channel的配置对象
             final ChannelConfig config = config();
             final ChannelPipeline pipeline = pipeline();
 
@@ -82,7 +79,7 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
                 try {
                     do {
                         // 对于 NioServerSocketChannel 来说，就是接收一个客户端 Channel，添加到 readBuf。
-                        // 调用子类的doReadMessages()方法, 读取数据包，并放入readBuf链表中, 当成功读取时返回1。
+                        // 调用子类的实现的方法, 读取数据包，并放入 readBuf 链表中, 当成功读取时返回1。
                         int localRead = doReadMessages(readBuf);
                         // 已无数据，跳出循环
                         if (localRead == 0) {
@@ -137,12 +134,6 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
                     }
                 }
             } finally {
-                // Check if there is a readPending which was not processed yet.
-                // This could be for two reasons:
-                // * The user called Channel.read() or ChannelHandlerContext.read() in channelRead(...) method
-                // * The user called Channel.read() or ChannelHandlerContext.read() in channelReadComplete(...) method
-                //
-                // See https://github.com/netty/netty/issues/2254
                 if (!readPending && !config.isAutoRead()) {
                     removeReadOp();
                 }
