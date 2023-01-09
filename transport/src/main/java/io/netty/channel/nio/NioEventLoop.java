@@ -525,27 +525,27 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         // 死循环
         for (;;) {
             try {
-                // selectStrategy 用于控制工作线程的select策略，在存在异步任务的场景，
+                // selectStrategy 用于控制工作线程的 select 策略，在存在异步任务的场景，
                 // NioEventLoop 会优先保证 CPU 能够及时处理异步任务；
                 int strategy;
                 try {
                     /*
                        确定 select 处理策略，用于控制 select 循环行为，包含 CONTINUE、SELECT、BUSY_WAIT 三种策略,
-                       Netty不支持 BUSY_WAIT，所以 BUSY_WAIT 与 SELECT 的执行逻辑是一样的。
+                       Netty 不支持 BUSY_WAIT。
 
                        当前有任务时，那么执行 selectNowSupplier 代表的方法，也就是 selector.selectNow()
                        当前无任务时，那么返回 SelectStrategy.SELECT,也就是-1
                      */
                     strategy = selectStrategy.calculateStrategy(selectNowSupplier, hasTasks());
                     switch (strategy) {
-                        case SelectStrategy.CONTINUE:
+                        case SelectStrategy.CONTINUE: // -2
                             continue;
 
-                        case SelectStrategy.BUSY_WAIT:
+                        case SelectStrategy.BUSY_WAIT: // -3
                             // NioEventLoop不支持，用于 EpollEventLoop，理论上不会走到这里
                             // fall-through to SELECT since the busy-wait is not supported with NIO
 
-                        case SelectStrategy.SELECT:
+                        case SelectStrategy.SELECT: // -1
                             // remind 任务队列为空的时候，会执行本逻辑
 
                             // 下一次定时任务触发截止时间
