@@ -105,7 +105,7 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
                 for (int i = 0; i < size; i++) {
                     readPending = false;
 
-                    // 通过 pipeline 传播 ChannelRead 事件
+                    // 通过 NioServerSocketChannel 的 pipeline 传播 ChannelRead 事件
                     // {@link io.netty.bootstrap.ServerBootstrap.ServerBootstrapAcceptor#channelRead}
                     pipeline.fireChannelRead(readBuf.get(i));
                 }
