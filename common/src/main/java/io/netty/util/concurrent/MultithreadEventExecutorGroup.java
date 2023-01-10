@@ -27,8 +27,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * {@link EventExecutorGroup} 实现的抽象基类,它同时用多个线程处理它们的任务。
- * <p>
  * Abstract base class for {@link EventExecutorGroup} implementations that handles their tasks with multiple threads at
  * the same time.
  */
@@ -65,32 +63,24 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
     /**
      * Create a new instance.
      *
-     * @param nThreads       the number of threads that will be used by this instance.
-     *                       内部 eventLoop(NioEventLoop) 数量,不指定则为CPU核数的2倍
-     * @param executor       the Executor to use, or {@code null} if the default should be used.
-     *                       JUC中的任务执行器(线程池),默认为null,每一个 eventLoop 内部都会包含一个 executor
-     * @param chooserFactory the {@link EventExecutorChooserFactory} to use.
-     *                       用于创建 Chooser 对象的工厂类
-     *                       Chooser可以看成一个负载均衡器,用于从 NioEventLoopGroup 中选择一个 eventLoop
-     * @param args           arguments which will passed to each {@link #newChild(Executor, Object...)} call
+     * @param nThreads          the number of threads that will be used by this instance.
+     * @param executor          the Executor to use, or {@code null} if the default should be used.
+     * @param chooserFactory    the {@link EventExecutorChooserFactory} to use.
+     * @param args              arguments which will passed to each {@link #newChild(Executor, Object...)} call
      */
     protected MultithreadEventExecutorGroup(int nThreads, Executor executor,
                                             EventExecutorChooserFactory chooserFactory, Object... args) {
         checkPositive(nThreads, "nThreads");
 
-        // 没有指定线程池,则创建默认.
         if (executor == null) {
             executor = new ThreadPerTaskExecutor(newDefaultThreadFactory());
         }
 
-        // 创建内部的 eventLoop 数组,nThreads 默认为CPU核数*2
         children = new EventExecutor[nThreads];
 
-        // 创建对应 nThreads 数量的 eventLoop 对象
         for (int i = 0; i < nThreads; i ++) {
             boolean success = false;
             try {
-                // 创建 eventLoop 对象,添加到 children 数组中
                 children[i] = newChild(executor, args);
                 success = true;
             } catch (Exception e) {
@@ -118,7 +108,6 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
             }
         }
 
-        // Chooser 本质可以看成一个负载均衡器,用于选择一个内部的 eventLoop
         chooser = chooserFactory.newChooser(children);
 
         final FutureListener<Object> terminationListener = new FutureListener<Object>() {
@@ -162,10 +151,9 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
     }
 
     /**
-     * 创建一个新的 EventExecutor,稍后将通过 next() 方法访问它。为这个 {@link MultithreadEventExecutorGroup} 服务的每个线程都将调用这个方法。
-     * <p>
      * Create a new EventExecutor which will later then accessible via the {@link #next()}  method. This method will be
      * called for each thread that will serve this {@link MultithreadEventExecutorGroup}.
+     *
      */
     protected abstract EventExecutor newChild(Executor executor, Object... args) throws Exception;
 

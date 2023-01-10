@@ -21,10 +21,10 @@
   <parent>
     <groupId>io.netty</groupId>
     <artifactId>netty-parent</artifactId>
-    <version>4.1.82.Final</version>
+    <version>4.1.86.Final</version>
   </parent>
 
-  <artifactId>netty-example</artifactId>
+  <artifactId>example</artifactId>
   <packaging>jar</packaging>
 
   <name>Netty/Example</name>

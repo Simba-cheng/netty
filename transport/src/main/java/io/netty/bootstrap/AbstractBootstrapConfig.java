@@ -74,10 +74,6 @@ public abstract class AbstractBootstrapConfig<B extends AbstractBootstrap<B, C>,
     }
 
     /**
-     * 返回已配置的 {@link EventLoopGroup},如果尚未配置,则返回null。
-     * <p>
-     * 这里返回的 {@link EventLoopGroup},是 parentGroup,即:用于监听客户端连接,专门负责与客户端创建连接
-     * <p>
      * Returns the configured {@link EventLoopGroup} or {@code null} if non is configured yet.
      */
     @SuppressWarnings("deprecation")

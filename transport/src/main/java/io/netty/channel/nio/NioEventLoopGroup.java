@@ -33,8 +33,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * {@link MultithreadEventLoopGroup} 的实现,用于基于NIO选择器的通道。
- * <p>
  * {@link MultithreadEventLoopGroup} implementations which is used for NIO {@link Selector} based {@link Channel}s.
  */
 public class NioEventLoopGroup extends MultithreadEventLoopGroup {
@@ -113,23 +111,6 @@ public class NioEventLoopGroup extends MultithreadEventLoopGroup {
         super(nThreads, executor, chooserFactory, selectorProvider, selectStrategyFactory, rejectedExecutionHandler);
     }
 
-    /**
-     * MARK 重点关注
-     *
-     * @param nThreads                 内部 eventLoop(NioEventLoop) 数量,不指定则为CPU核数的2倍
-     * @param executor                 JUC中的任务执行器(线程池),每一个 eventLoop 内部都会包含一个 executor
-     *                                 默认为 ThreadPerTaskExecutor,即为每个任务创建一个线程处理。
-     * @param chooserFactory           用于创建 Chooser 对象的工厂类
-     *                                 Chooser可以看成一个负载均衡器,用于从 NioEventLoopGroup 中选择一个 EventLoop
-     * @param selectorProvider         NIO工具类
-     *                                 SelectorProvider使用了JDK的 SPI机制 来创建Selector、ServerSocketChannel、SocketChannel 等对象；
-     * @param selectStrategyFactory    用来创建 SelectStrategy 的工厂
-     *                                 SelectStrategy 是 Netty 用来控制 eventLoop 轮询方式的策略,默认为 DefaultSelectStrategy；
-     * @param rejectedExecutionHandler 线程池的任务拒绝策略
-     *                                 默认是抛出 RejectedExecutionException 异常；
-     * @param taskQueueFactory         任务队列工厂类,每一个EventLoop对象内部都会包含一个任务队列
-     *                                 这个工厂类就是用来创建队列的,默认会创建一个Netty自定义线程安全的 MpscUnboundedArrayQueue 无锁队列。
-     */
     public NioEventLoopGroup(int nThreads, Executor executor, EventExecutorChooserFactory chooserFactory,
                              final SelectorProvider selectorProvider,
                              final SelectStrategyFactory selectStrategyFactory,
@@ -185,22 +166,10 @@ public class NioEventLoopGroup extends MultithreadEventLoopGroup {
 
     @Override
     protected EventLoop newChild(Executor executor, Object... args) throws Exception {
-
-        // 以下都是用于构建 eventLoop 的参数
-
-        // NIO工具类,SelectorProvider 使用了JDK的 SPI机制 来创建Selector、ServerSocketChannel、SocketChannel 等对象；
         SelectorProvider selectorProvider = (SelectorProvider) args[0];
-
-        // SelectStrategy 是 Netty 用来控制 eventLoop 轮询方式的策略,此处 args[0] = DefaultSelectStrategyFactory.INSTANCE；
         SelectStrategyFactory selectStrategyFactory = (SelectStrategyFactory) args[1];
-
-        // 线程池的任务拒绝策略,默认是抛出 RejectedExecutionException 异常；
         RejectedExecutionHandler rejectedExecutionHandler = (RejectedExecutionHandler) args[2];
-
-        // 任务队列工厂类,每一个EventLoop对象内部都会包含一个任务队列
-        // 这个工厂类就是用来创建队列的,默认会创建一个Netty自定义线程安全的 MpscUnboundedArrayQueue 无锁队列。
         EventLoopTaskQueueFactory taskQueueFactory = null;
-
         EventLoopTaskQueueFactory tailTaskQueueFactory = null;
 
         int argsLength = args.length;
@@ -210,7 +179,6 @@ public class NioEventLoopGroup extends MultithreadEventLoopGroup {
         if (argsLength > 4) {
             tailTaskQueueFactory = (EventLoopTaskQueueFactory) args[4];
         }
-
         return new NioEventLoop(this, executor, selectorProvider,
                 selectStrategyFactory.newSelectStrategy(),
                 rejectedExecutionHandler, taskQueueFactory, tailTaskQueueFactory);

@@ -409,7 +409,7 @@ public class HAProxyMessageDecoder extends ByteToMessageDecoder {
         }
 
         /**
-         * Find the end of the header from the given {@link ByteBuf},the end may be a CRLF, or the length given by the
+         * Find the end of the header from the given {@link ByteBuf}，the end may be a CRLF, or the length given by the
          * header.
          *
          * @param buffer the buffer to be searched

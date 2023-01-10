@@ -29,9 +29,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * {@link EventLoop} 的抽象基类,它在一个线程中执行所有提交的任务。
- * <p>
  * Abstract base class for {@link EventLoop}s that execute all its submitted tasks in a single thread.
+ *
  */
 public abstract class SingleThreadEventLoop extends SingleThreadEventExecutor implements EventLoop {
 
@@ -65,12 +64,7 @@ public abstract class SingleThreadEventLoop extends SingleThreadEventExecutor im
     protected SingleThreadEventLoop(EventLoopGroup parent, Executor executor,
                                     boolean addTaskWakesUp, Queue<Runnable> taskQueue, Queue<Runnable> tailTaskQueue,
                                     RejectedExecutionHandler rejectedExecutionHandler) {
-
-        // addTaskWakesUp 默认为false,用于标记 添加的任务是否会唤醒线程
-        // CALL_UP 调用父类
         super(parent, executor, addTaskWakesUp, taskQueue, rejectedExecutionHandler);
-
-        // 可以忽略
         tailTasks = ObjectUtil.checkNotNull(tailTaskQueue, "tailTaskQueue");
     }
 
@@ -86,35 +80,12 @@ public abstract class SingleThreadEventLoop extends SingleThreadEventExecutor im
 
     @Override
     public ChannelFuture register(Channel channel) {
-        /*
-            如果从 ServerBootstrap#childGroup.register(child) 方法而来,是已建立的连接
-
-            MARK
-            如果从 AbstractBootstrap#initAndRegister#config().group().register 方法而来,
-            是用于注册 parentGroup 中的 NioServerSocketChannel,由 serverBootstrap.channel 方法设置
-         */
         return register(new DefaultChannelPromise(channel, this));
     }
 
-    /**
-     * @param promise 包装过的channel
-     *                可能是 parentGroup 中的 NioServerSocketChannel,也可能是 childGroup 中已建立连接的 nioSocketChannel
-     */
     @Override
     public ChannelFuture register(final ChannelPromise promise) {
         ObjectUtil.checkNotNull(promise, "promise");
-
-        /*
-            如果从 ServerBootstrap#childGroup.register(child) 方法而来,是已建立的连接
-
-            MARK
-            如果从 AbstractBootstrap#initAndRegister#config().group().register 方法而来,
-            是用于注册 parentGroup 中的 NioServerSocketChannel,由 serverBootstrap.channel 方法设置
-
-            register方法 调用 => io.netty.channel.AbstractChannel.AbstractUnsafe.register
-
-            向 parentGroup、childGroup 注册 channel 是同一个方法
-         */
         promise.channel().unsafe().register(this, promise);
         return promise;
     }

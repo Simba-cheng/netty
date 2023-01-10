@@ -17,11 +17,12 @@ package io.netty.handler.codec.http;
 
 import io.netty.handler.codec.http.HttpHeadersTestUtils.HeaderValue;
 import io.netty.util.AsciiString;
+import io.netty.util.internal.EmptyArrays;
 import io.netty.util.internal.StringUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -40,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultHttpHeadersTest {
     private static final CharSequence HEADER_NAME = "testHeader";
+    private static final CharSequence ILLEGAL_VALUE = "testHeader\r\nContent-Length:45\r\n\r\n";
 
     @Test
     public void nullHeaderNameNotAllowed() {
@@ -80,11 +82,11 @@ public class DefaultHttpHeadersTest {
     @Test
     public void keysShouldBeCaseInsensitiveInHeadersEquals() {
         DefaultHttpHeaders headers1 = new DefaultHttpHeaders();
-        headers1.add(of("name1"), Arrays.asList("value1", "value2", "value3"));
+        headers1.add(of("name1"), asList("value1", "value2", "value3"));
         headers1.add(of("nAmE2"), of("value4"));
 
         DefaultHttpHeaders headers2 = new DefaultHttpHeaders();
-        headers2.add(of("naMe1"), Arrays.asList("value1", "value2", "value3"));
+        headers2.add(of("naMe1"), asList("value1", "value2", "value3"));
         headers2.add(of("NAME2"), of("value4"));
 
         assertEquals(headers1, headers1);
@@ -234,6 +236,28 @@ public class DefaultHttpHeadersTest {
     }
 
     @Test
+    public void setCharSequenceValidatesValue() {
+        final DefaultHttpHeaders headers = newDefaultDefaultHttpHeaders();
+        assertThrows(IllegalArgumentException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                headers.set(HEADER_NAME, ILLEGAL_VALUE);
+            }
+        });
+    }
+
+    @Test
+    public void setIterableValidatesValue() {
+        final DefaultHttpHeaders headers = newDefaultDefaultHttpHeaders();
+        assertThrows(IllegalArgumentException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                headers.set(HEADER_NAME, Collections.singleton(ILLEGAL_VALUE));
+            }
+        });
+    }
+
+    @Test
     public void toStringOnEmptyHeaders() {
         assertEquals("DefaultHttpHeaders[]", newDefaultDefaultHttpHeaders().toString());
     }
@@ -259,7 +283,7 @@ public class DefaultHttpHeadersTest {
                 .add(HttpHeaderNames.CONTENT_LENGTH, 10)
                 .names();
 
-        String[] namesArray = nettyHeaders.toArray(new String[0]);
+        String[] namesArray = nettyHeaders.toArray(EmptyArrays.EMPTY_STRINGS);
         assertArrayEquals(namesArray, new String[] { HttpHeaderNames.CONTENT_LENGTH.toString() });
     }
 

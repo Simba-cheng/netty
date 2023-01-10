@@ -27,8 +27,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadFactory;
 
 /**
- *  {@link EventLoopGroup} 实现的抽象基类,它同时用多个线程处理它们的任务。
- * <p>
  * Abstract base class for {@link EventLoopGroup} implementations that handles their tasks with multiple threads at
  * the same time.
  */
@@ -85,14 +83,6 @@ public abstract class MultithreadEventLoopGroup extends MultithreadEventExecutor
 
     @Override
     public ChannelFuture register(Channel channel) {
-        /*
-            如果从 ServerBootstrap#childGroup.register(child) 方法而来,是已建立的连接
-
-            如果从 AbstractBootstrap#initAndRegister#config().group().register 方法而来,
-            是用于注册 parentGroup 中的 NioServerSocketChannel,由 serverBootstrap.channel 方法设置
-
-            register 的实现类 SingleThreadEventLoop
-         */
         return next().register(channel);
     }
 

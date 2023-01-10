@@ -32,10 +32,6 @@ public final class DefaultEventExecutorChooserFactory implements EventExecutorCh
 
     @Override
     public EventExecutorChooser newChooser(EventExecutor[] executors) {
-        /*
-            知识点(以后用得上)
-            根据待绑定的 executor 数量是否是2的幂次方,选择不同的'选择器实现'
-         */
         if (isPowerOfTwo(executors.length)) {
             return new PowerOfTwoEventExecutorChooser(executors);
         } else {
@@ -51,16 +47,12 @@ public final class DefaultEventExecutorChooserFactory implements EventExecutorCh
         private final AtomicInteger idx = new AtomicInteger();
         private final EventExecutor[] executors;
 
-         PowerOfTwoEventExecutorChooser(EventExecutor[] executors) {
+        PowerOfTwoEventExecutorChooser(EventExecutor[] executors) {
             this.executors = executors;
         }
 
         @Override
         public EventExecutor next() {
-            /*
-                知识点(以后用得上)
-                executors总数必须是2的幂次方(2,4,8...等)才会用,&的运算效率更高
-             */
             return executors[idx.getAndIncrement() & executors.length - 1];
         }
     }
@@ -78,10 +70,6 @@ public final class DefaultEventExecutorChooserFactory implements EventExecutorCh
 
         @Override
         public EventExecutor next() {
-            /*
-                知识点(以后用得上)
-                递增、取模 , 取正值,不可能是负数
-             */
             return executors[(int) Math.abs(idx.getAndIncrement() % executors.length)];
         }
     }
