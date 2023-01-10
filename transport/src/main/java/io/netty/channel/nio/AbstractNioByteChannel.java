@@ -146,11 +146,11 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
                 return;
             }
             final ChannelPipeline pipeline = pipeline();
-            // 获取内容分配器，默认为 PooledByteBufAllocator
+            // 获取 ByteBuf 分配器，默认为 PooledByteBufAllocator
             final ByteBufAllocator allocator = config.getAllocator();
+            // 计算容量
             final RecvByteBufAllocator.Handle allocHandle = recvBufAllocHandle();
             // 清空上一次读取的字节数，每次读取时均重新计算
-            // 字节Buf分配器，并计算字节buf分配器 Handler
             allocHandle.reset(config);
 
             ByteBuf byteBuf = null;
