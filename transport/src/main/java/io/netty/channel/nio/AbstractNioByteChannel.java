@@ -135,7 +135,7 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
         }
 
         /**
-         * OP_READ 触发此方法
+         * OP_READ
          */
         @Override
         public final void read() {

@@ -837,7 +837,6 @@ public final class NioEventLoop extends SingleThreadEventLoop {
             // still healthy and should not be closed.
             // See https://github.com/netty/netty/issues/5125
             if (eventLoop == this) {
-                // Key 不合法, 直接关闭连接
                 unsafe.close(unsafe.voidPromise());
             }
             return;
