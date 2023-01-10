@@ -139,9 +139,8 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
          */
         @Override
         public final void read() {
-            // 获取 pipeline 通道配置、channel 管道
             final ChannelConfig config = config();
-            // socketChannel 已经关闭
+            // 检查 socketChannel 是否准备好读取数据
             if (shouldBreakReadReady(config)) {
                 clearReadPending();
                 return;
