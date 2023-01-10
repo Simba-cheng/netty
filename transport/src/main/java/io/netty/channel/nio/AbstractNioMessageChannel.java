@@ -52,6 +52,7 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
     }
 
     protected boolean continueReading(RecvByteBufAllocator.Handle allocHandle) {
+        // DefaultMaxMessagesRecvByteBufAllocator.MaxMessageHandle.continueReading
         return allocHandle.continueReading();
     }
 
@@ -94,7 +95,7 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
 
                         // 递增已读取的消息数量
                         allocHandle.incMessagesRead(localRead);
-                        // 默认循环不超过16次
+                        // 循环不超过16次
                     } while (continueReading(allocHandle));
                 } catch (Throwable t) {
                     exception = t;
