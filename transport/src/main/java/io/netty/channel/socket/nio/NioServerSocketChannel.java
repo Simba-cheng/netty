@@ -49,6 +49,10 @@ public class NioServerSocketChannel extends AbstractNioMessageChannel
                              implements io.netty.channel.socket.ServerSocketChannel {
 
     private static final ChannelMetadata METADATA = new ChannelMetadata(false, 16);
+
+    /**
+     * java.nio 包中的内容,用于获取 java.nio.channels.ServerSocketChannel 实例
+     */
     private static final SelectorProvider DEFAULT_SELECTOR_PROVIDER = SelectorProvider.provider();
 
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(NioServerSocketChannel.class);
@@ -60,12 +64,17 @@ public class NioServerSocketChannel extends AbstractNioMessageChannel
         try {
             ServerSocketChannel channel =
                     SelectorProviderUtil.newChannel(OPEN_SERVER_SOCKET_CHANNEL_WITH_FAMILY, provider, family);
+
+            // 获取的是 java.nio.channels.ServerSocketChannel 实例
             return channel == null ? provider.openServerSocketChannel() : channel;
         } catch (IOException e) {
             throw new ChannelException("Failed to open a socket.", e);
         }
     }
 
+    /**
+     * 用于配置 ServerSocketCHannel 的TCP参数
+     */
     private final ServerSocketChannelConfig config;
 
     /**
@@ -93,6 +102,7 @@ public class NioServerSocketChannel extends AbstractNioMessageChannel
      * Create a new instance using the given {@link ServerSocketChannel}.
      */
     public NioServerSocketChannel(ServerSocketChannel channel) {
+        // 在父类中完成了 非阻塞IO的配置,及事件的注册
         super(null, channel, SelectionKey.OP_ACCEPT);
         config = new NioServerSocketChannelConfig(this, javaChannel().socket());
     }
@@ -149,11 +159,17 @@ public class NioServerSocketChannel extends AbstractNioMessageChannel
         javaChannel().close();
     }
 
+    /**
+     * 对 NioServerSocketChannel 来说,它的读取操作就是接收客户端的连接,创建 NioSocketChannel 对象
+     */
     @Override
     protected int doReadMessages(List<Object> buf) throws Exception {
+        // 通过 java.nio.channels.ServerSocketChannel 的 accept 方法 接收新的客户端连接,
+        // 即 java.nio.channels.SocketChannel
         SocketChannel ch = SocketUtils.accept(javaChannel());
 
         try {
+            // 如果获取到客户端连接对象 java.nio.channels.SocketChannel, 创建 NioSocketChannel,并添加到 buf 中
             if (ch != null) {
                 buf.add(new NioSocketChannel(this, ch));
                 return 1;
