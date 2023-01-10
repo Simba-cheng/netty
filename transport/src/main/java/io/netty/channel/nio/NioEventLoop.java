@@ -51,9 +51,10 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * {@link SingleThreadEventLoop} 实现,它将 {@link Channel} 注册到 {@link Selector},并且在事件循环中对这些通道进行多路复用。
+ * <p>
  * {@link SingleThreadEventLoop} implementation which register the {@link Channel}'s to a
  * {@link Selector} and so does the multi-plexing of these in the event loop.
- *
  */
 public final class NioEventLoop extends SingleThreadEventLoop {
 
@@ -114,11 +115,20 @@ public final class NioEventLoop extends SingleThreadEventLoop {
 
     /**
      * The NIO {@link Selector}.
+     * <p>
+     * 作为 NIO框架 的 Reactor线程, NioEventLoop 需要处理 网络I/O读写事件, 因此它必须聚合一个多路复用器对象 Selector
      */
     private Selector selector;
     private Selector unwrappedSelector;
+
+    /**
+     * 保存 java.nio.channels.SelectionKey 的集合
+     */
     private SelectedSelectionKeySet selectedKeys;
 
+    /**
+     * 通过 provider.open() 从操作系统底层获取 Selector实例
+     */
     private final SelectorProvider provider;
 
     private static final long AWAKE = -1L;
@@ -139,10 +149,16 @@ public final class NioEventLoop extends SingleThreadEventLoop {
     NioEventLoop(NioEventLoopGroup parent, Executor executor, SelectorProvider selectorProvider,
                  SelectStrategy strategy, RejectedExecutionHandler rejectedExecutionHandler,
                  EventLoopTaskQueueFactory taskQueueFactory, EventLoopTaskQueueFactory tailTaskQueueFactory) {
+
+        // CALL_UP 调用父类
+        // newTaskQueue(taskQueueFactory): 初始化 NioEventLoop 内部的任务队列
         super(parent, executor, false, newTaskQueue(taskQueueFactory), newTaskQueue(tailTaskQueueFactory),
                 rejectedExecutionHandler);
+
         this.provider = ObjectUtil.checkNotNull(selectorProvider, "selectorProvider");
         this.selectStrategy = ObjectUtil.checkNotNull(strategy, "selectStrategy");
+
+        // MARK 创建 selector
         final SelectorTuple selectorTuple = openSelector();
         this.selector = selectorTuple.selector;
         this.unwrappedSelector = selectorTuple.unwrappedSelector;
@@ -173,6 +189,8 @@ public final class NioEventLoop extends SingleThreadEventLoop {
 
     private SelectorTuple openSelector() {
         final Selector unwrappedSelector;
+
+        // 创建 selector
         try {
             unwrappedSelector = provider.openSelector();
         } catch (IOException e) {
@@ -208,12 +226,16 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         }
 
         final Class<?> selectorImplClass = (Class<?>) maybeSelectorImplClass;
+
+        // SelectedSelectionKeySet 是 netty 优化后的 Set 类型
         final SelectedSelectionKeySet selectedKeySet = new SelectedSelectionKeySet();
 
         Object maybeException = AccessController.doPrivileged(new PrivilegedAction<Object>() {
             @Override
             public Object run() {
                 try {
+
+                    // 用反射的方式, 把 Selector 内部的 selectedKeys 和 publicSelectedKeys 替换成 netty 优化后的 SelectedSelectionKeySet（7-12）
                     Field selectedKeysField = selectorImplClass.getDeclaredField("selectedKeys");
                     Field publicSelectedKeysField = selectorImplClass.getDeclaredField("publicSelectedKeys");
 
@@ -503,10 +525,20 @@ public final class NioEventLoop extends SingleThreadEventLoop {
     @Override
     protected void run() {
         int selectCnt = 0;
-        for (;;) {
+        // 死循环
+        for (; ; ) {
             try {
+                // selectStrategy 用于控制工作线程的 select 策略, 在存在异步任务的场景,
+                // NioEventLoop 会优先保证 CPU 能够及时处理异步任务；
                 int strategy;
                 try {
+                    /*
+                       确定 select 处理策略, 用于控制 select 循环行为, 包含 CONTINUE、SELECT、BUSY_WAIT 三种策略,
+                       Netty 不支持 BUSY_WAIT。
+
+                       当前有任务时, 那么执行 selectNowSupplier 代表的方法, 也就是 selector.selectNow()
+                       当前无任务时, 那么返回 SelectStrategy.SELECT,也就是-1
+                     */
                     strategy = selectStrategy.calculateStrategy(selectNowSupplier, hasTasks());
                     switch (strategy) {
                     case SelectStrategy.CONTINUE:
