@@ -85,7 +85,7 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
                 try {
                     do {
                         // 对于 NioServerSocketChannel 来说, 就是接收一个客户端 Channel, 添加到 readBuf。
-                        // 调用子类的实现的方法, 读取数据包, 并放入 readBuf 链表中, 当成功读取时返回1。
+                        // 调用子类的实现的方法, 当成功读取时返回1。
                         // io.netty.channel.socket.nio.NioServerSocketChannel.doReadMessages
                         int localRead = doReadMessages(readBuf);
                         // 已无数据, 跳出循环
