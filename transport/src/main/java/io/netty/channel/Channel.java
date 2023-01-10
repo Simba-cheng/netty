@@ -78,16 +78,28 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
 
     /**
      * Returns the globally unique identifier of this {@link Channel}.
+     * <p>
+     * 获取 Channel 的唯一标识
      */
     ChannelId id();
 
     /**
      * Return the {@link EventLoop} this {@link Channel} was registered to.
+     * <p>
+     * 获取到 Channel 注册的 EventLoop.
+     * <pre>
+     * Channel 需要注册到 EventLoop 的多路复用器上,用于处理I/O事件,
+     * EventLoop 本质上就是处理网络读写事件的 Reactor 线程。
+     * 在Netty中,它不仅仅用来处理网络事件,也可以用来执行定时务和用户自定义NioTask等任务。
+     * </pre>
      */
     EventLoop eventLoop();
 
     /**
      * Returns the parent of this channel.
+     * <p>
+     * 对于服务端 Channel 而言,它的父Channel为空；
+     * 对于客户端 Channel ,它的 父Channel 就是创建它的 ServerSocketChannel。
      *
      * @return the parent channel.
      *         {@code null} if this channel does not have a parent channel.
@@ -96,26 +108,41 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
 
     /**
      * Returns the configuration of this channel.
+     *
+     * 获取当前 Channel 的配置信息,如 CONNECT_TIMEOUT_MILLIS
      */
     ChannelConfig config();
 
     /**
      * Returns {@code true} if the {@link Channel} is open and may get active later
+     *
+     * 判断当前 Channel 是否打开
      */
     boolean isOpen();
 
     /**
      * Returns {@code true} if the {@link Channel} is registered with an {@link EventLoop}.
+     *
+     * 判断当前 Channel 是否已经注册到 EventLoop 上
      */
     boolean isRegistered();
 
     /**
      * Return {@code true} if the {@link Channel} is active and so connected.
+     *
+     * 判断当前 Channel 是否处于激活状态
      */
     boolean isActive();
 
     /**
      * Return the {@link ChannelMetadata} of the {@link Channel} which describe the nature of the {@link Channel}.
+     * <p>
+     * 获取当前 Channel 的 TCP 参数配置
+     * <pre>
+     * 当创建 Socket 的时候需要指定 TCP 参数,例如: 接收和发送的TCP缓冲区大小,TCP的超时时间,是否重用地址等等。
+     * 在Netty中,每个 Channel 对应一个物理连接,每个连接都有自己的 TCP 参数配置。
+     * 所以,Channel 会聚合一个 ChannelMetadata 用来对 TCP 参数提供元数据描述信息。
+     * </pre>
      */
     ChannelMetadata metadata();
 
@@ -124,6 +151,8 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      * {@link SocketAddress} is supposed to be down-cast into more concrete
      * type such as {@link InetSocketAddress} to retrieve the detailed
      * information.
+     * <p>
+     * 当前 Channel 的本地绑定地址
      *
      * @return the local address of this channel.
      *         {@code null} if this channel is not bound.
@@ -135,6 +164,8 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      * returned {@link SocketAddress} is supposed to be down-cast into more
      * concrete type such as {@link InetSocketAddress} to retrieve the detailed
      * information.
+     * <p>
+     * 获取当前 Channel 通信的远程 socket 地址
      *
      * @return the remote address of this channel.
      *         {@code null} if this channel is not connected.
@@ -187,9 +218,22 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      */
     ByteBufAllocator alloc();
 
+    /**
+     * 从当前的 Channel 中读取数据到第一个 inbound 缓冲区中;
+     * <pre>
+     * 如果数据被成功读取,触发 ChannelHandler.channelRead(ChannelHandlerContext,Object) 事件
+     *
+     * 读取操作API调用完成之后,紧接着会触发 ChannelHandler.channelReadComplete(ChannelHandlerContext) 事件,
+     * 这样业务的 ChannelHandler 可以决定是否需要继续读取数据。
+     * 如果已经有读操作请求被挂起,则后续的读操作会被忽略。
+     * </pre>
+     */
     @Override
     Channel read();
 
+    /**
+     * 将之前写入到发送环形数组中的消息全部写入到目标Chanel中,发送给通信对方
+     */
     @Override
     Channel flush();
 
@@ -205,6 +249,10 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
      *   <li>{@link #deregister(ChannelPromise)}</li>
      *   <li>{@link #voidPromise()}</li>
      * </ul>
+     *
+     * <b>实际的I/O读写操作都是由Unsafe接口负责完成的。</b>
+     * <p>
+     * Unsafe接口实际上是Channel接口的辅助接口,它不应该被用户代码直接调用。
      */
     interface Unsafe {
 
@@ -217,24 +265,32 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
         /**
          * Return the {@link SocketAddress} to which is bound local or
          * {@code null} if none.
+         * <p>
+         * 返回绑定的 本地地址
          */
         SocketAddress localAddress();
 
         /**
          * Return the {@link SocketAddress} to which is bound remote or
          * {@code null} if none is bound yet.
+         * <p>
+         * 返回绑定的 远程地址
          */
         SocketAddress remoteAddress();
 
         /**
          * Register the {@link Channel} of the {@link ChannelPromise} and notify
          * the {@link ChannelFuture} once the registration was complete.
+         * <p>
+         * 将 Channel 注册到 EventLoop 上
          */
         void register(EventLoop eventLoop, ChannelPromise promise);
 
         /**
          * Bind the {@link SocketAddress} to the {@link Channel} of the {@link ChannelPromise} and notify
          * it once its done.
+         * <p>
+         * 绑定 本地地址 到 Channel 上
          */
         void bind(SocketAddress localAddress, ChannelPromise promise);
 
@@ -250,12 +306,16 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
         /**
          * Disconnect the {@link Channel} of the {@link ChannelFuture} and notify the {@link ChannelPromise} once the
          * operation was complete.
+         * <p>
+         * 断开连接
          */
         void disconnect(ChannelPromise promise);
 
         /**
          * Close the {@link Channel} of the {@link ChannelPromise} and notify the {@link ChannelPromise} once the
          * operation was complete.
+         * <p>
+         * 关闭连接
          */
         void close(ChannelPromise promise);
 
@@ -274,16 +334,22 @@ public interface Channel extends AttributeMap, ChannelOutboundInvoker, Comparabl
         /**
          * Schedules a read operation that fills the inbound buffer of the first {@link ChannelInboundHandler} in the
          * {@link ChannelPipeline}.  If there's already a pending read operation, this method does nothing.
+         * <p>
+         * 读就绪 网络事件
          */
         void beginRead();
 
         /**
          * Schedules a write operation.
+         * <p>
+         * 发送数据
          */
         void write(Object msg, ChannelPromise promise);
 
         /**
          * Flush out all write operations scheduled via {@link #write(Object, ChannelPromise)}.
+         * <p>
+         * 将缓冲区的数据 刷到 Channel
          */
         void flush();
 
