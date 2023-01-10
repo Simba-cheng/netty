@@ -63,6 +63,7 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
 
     private final class NioMessageUnsafe extends AbstractNioUnsafe {
 
+        // 存放建立连接后，创建的 NioSocketChannel
         private final List<Object> readBuf = new ArrayList<Object>();
 
         /**
@@ -71,12 +72,14 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
         @Override
         public void read() {
             assert eventLoop().inEventLoop();
+
+            // NioServerSocketChannel 中的 config, pipeline
             final ChannelConfig config = config();
             final ChannelPipeline pipeline = pipeline();
 
-            // 接收对端数据时, ByteBuf的分配策略, 基于历史数据动态调整初始化大小, 避免太大浪费空间, 太小又会频繁扩容
+            // 创建接收数据的 Buffer分配器, 其为 byteBuf 分配大小合适的空间。
+            // 在当前场景中(接收连接的场景中), 这里的 allocHandle 只是用于控制循环接受并创建连接的次数。
             final RecvByteBufAllocator.Handle allocHandle = unsafe().recvBufAllocHandle();
-            // 清空上次的记录
             allocHandle.reset(config);
 
             boolean closed = false;
@@ -108,7 +111,7 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
 
                 // 循环处理 readBuf 中的 NioSocketChannel
                 int size = readBuf.size();
-                for (int i = 0; i < size; i ++) {
+                for (int i = 0; i < size; i++) {
                     readPending = false;
 
                     // 通过 NioServerSocketChannel 的 pipeline 传播 ChannelRead 事件
@@ -172,7 +175,7 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
             }
             try {
                 boolean done = false;
-                //获取配置中, 循环写的最大次数
+                // 获取配置中, 循环写的最大次数
                 for (int i = config().getWriteSpinCount() - 1; i >= 0; i--) {
                     // 调用子方法进行循环写操作, 成功返回true
                     if (doWriteMessage(msg, in)) {
