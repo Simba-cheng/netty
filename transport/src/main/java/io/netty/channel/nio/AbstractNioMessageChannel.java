@@ -101,7 +101,7 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
                             break;
                         }
 
-                        // 递增已读取的消息数量
+                        // 统计在当前事件循环中已经创建连接的个数
                         allocHandle.incMessagesRead(localRead);
                         // 循环不超过16次
                     } while (continueReading(allocHandle));
