@@ -567,16 +567,16 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                 // 回调 pipeline 中添加的 ChannelInitializer 的 handlerAdded 方法。
                 pipeline.invokeHandlerAddedIfNeeded();
 
-                // 设置 regFuture 为 success，
-                // 触发 operationComplete 回调,将 bind 操作放入 Reactor 的任务队列中，等待 Reactor 线程执行。
+                // 设置 regFuture 为 success, 
+                // 触发 operationComplete 回调,将 bind 操作放入 Reactor 的任务队列中, 等待 Reactor 线程执行。
                 safeSetSuccess(promise);
 
                 // 触发 channelRegistered 事件
                 pipeline.fireChannelRegistered();
 
                 // 对于服务端 ServerSocketChannel 来说 只有绑定端口地址成功后 channel 的状态才是 active 的,
-                // 此时绑定操作作为异步任务在 Reactor 的任务队列中，绑定操作还没开始，所以这里的 isActive() 是 false,
-                // 注册时不活跃，绑定端口后活跃
+                // 此时绑定操作作为异步任务在 Reactor 的任务队列中, 绑定操作还没开始, 所以这里的 isActive() 是 false,
+                // 注册时不活跃, 绑定端口后活跃
                 if (isActive()) {
                     if (firstRegistration) {
                         pipeline.fireChannelActive();
@@ -592,7 +592,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
         }
 
         /**
-         * 绑定指定的端口，对于服务端 用于绑定监听端口，对于客户端，主要用于指定 客户端Channel 的本地绑定Socket地址。
+         * 绑定指定的端口, 对于服务端 用于绑定监听端口, 对于客户端, 主要用于指定 客户端Channel 的本地绑定Socket地址。
          */
         @Override
         public final void bind(final SocketAddress localAddress, final ChannelPromise promise) {
@@ -641,7 +641,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
         }
 
         /**
-         * 客户端 或 服务端，主动关闭连接
+         * 客户端 或 服务端, 主动关闭连接
          */
         @Override
         public final void disconnect(final ChannelPromise promise) {
@@ -677,8 +677,8 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
         }
 
         /**
-         * 在链路关闭之前需要首先判断是否处于刷新状态，如果处于刷新状态说明还有消息尚未发送出去，
-         * 需要等到所有消息发送完成再关闭链路，因此，将关闭操作封装成Runnable稍后再执行
+         * 在链路关闭之前需要首先判断是否处于刷新状态, 如果处于刷新状态说明还有消息尚未发送出去, 
+         * 需要等到所有消息发送完成再关闭链路, 因此, 将关闭操作封装成Runnable稍后再执行
          */
         @Override
         public void close(final ChannelPromise promise) {
@@ -913,7 +913,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
         }
 
         /**
-         * 本方法实际上将消息添加到环形发送数组中，并不是真正的写Channel
+         * 本方法实际上将消息添加到环形发送数组中, 并不是真正的写Channel
          */
         @Override
         public final void write(Object msg, ChannelPromise promise) {
@@ -955,7 +955,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
         }
 
         /**
-         * 将缓冲区中待发送的消息全部写入 Channel，并发送给通信对方
+         * 将缓冲区中待发送的消息全部写入 Channel, 并发送给通信对方
          */
         @Override
         public final void flush() {

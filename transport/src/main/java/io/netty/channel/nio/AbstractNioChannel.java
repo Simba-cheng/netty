@@ -230,7 +230,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
     }
 
     /**
-     * AbstractNioUnsafe 是 AbstractUnsafe 类 的 NIO 实现，它主要实现了 connect 、finishConnect 等方法。
+     * AbstractNioUnsafe 是 AbstractUnsafe 类 的 NIO 实现, 它主要实现了 connect 、finishConnect 等方法。
      */
     protected abstract class AbstractNioUnsafe extends AbstractUnsafe implements NioUnsafe {
 
@@ -255,7 +255,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
         }
 
         /**
-         * 获取当前的连接状态进行缓存，然后发起连接操作。
+         * 获取当前的连接状态进行缓存, 然后发起连接操作。
          */
         @Override
         public final void connect(

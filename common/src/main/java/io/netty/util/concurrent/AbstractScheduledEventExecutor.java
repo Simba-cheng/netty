@@ -156,7 +156,7 @@ public abstract class AbstractScheduledEventExecutor extends AbstractEventExecut
     protected final Runnable pollScheduledTask(long nanoTime) {
         assert inEventLoop();
 
-        // 比较定时任务的 deadlineNanos 和当前时间，如果小于等于就取出，否则返回 null
+        // 比较定时任务的 deadlineNanos 和当前时间, 如果小于等于就取出, 否则返回 null
         ScheduledFutureTask<?> scheduledTask = peekScheduledTask();
         if (scheduledTask == null || scheduledTask.deadlineNanos() - nanoTime > 0) {
             return null;

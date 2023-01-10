@@ -146,11 +146,10 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
                 return;
             }
             final ChannelPipeline pipeline = pipeline();
-            // 获取 ByteBuf 分配器，默认为 PooledByteBufAllocator
+            // 获取 ByteBuf 分配器, 默认为 PooledByteBufAllocator
             final ByteBufAllocator allocator = config.getAllocator();
-            // 计算容量
             final RecvByteBufAllocator.Handle allocHandle = recvBufAllocHandle();
-            // 清空上一次读取的字节数，每次读取时均重新计算
+            // 清空上一次读取的字节数
             allocHandle.reset(config);
 
             ByteBuf byteBuf = null;
@@ -162,12 +161,12 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
                     // 读取通道接收缓冲区的数据
                     allocHandle.lastBytesRead(doReadBytes(byteBuf));
                     if (allocHandle.lastBytesRead() <= 0) {
-                        // 若没有数据可以读，则释放内存
+                        // 若没有数据可以读, 则释放内存
                         byteBuf.release();
                         byteBuf = null;
                         close = allocHandle.lastBytesRead() < 0;
                         if (close) {
-                            // 当读到-1时，表示Channel通道已经关闭，没有必要再继续读。
+                            // 当读到-1时, 表示Channel通道已经关闭, 没有必要再继续读。
                             readPending = false;
                         }
                         break;
@@ -177,7 +176,7 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
                     allocHandle.incMessagesRead(1);
                     readPending = false;
 
-                    // 通知通道处理器处理数据，通过 Channel 的pipeline 传播 ChannelRead 事件
+                    // 通知通道处理器处理数据, 通过 Channel 的 pipeline 传播 ChannelRead 事件
                     pipeline.fireChannelRead(byteBuf);
                     byteBuf = null;
                 } while (allocHandle.continueReading());
@@ -187,14 +186,14 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
                 pipeline.fireChannelReadComplete();
 
                 if (close) {
-                    // 如果Socket通道关闭，则关闭读操作
+                    // 如果Socket通道关闭, 则关闭读操作
                     closeOnRead(pipeline);
                 }
             } catch (Throwable t) {
                 handleReadException(pipeline, byteBuf, t, close, allocHandle);
             } finally {
                 if (!readPending && !config.isAutoRead()) {
-                    // 若读操作完毕，且没有配置自动读，则选择Key兴趣集中移除读操作事件。
+                    // 若读操作完毕, 且没有配置自动读, 则选择Key兴趣集中移除读操作事件。
                     removeReadOp();
                 }
             }
@@ -228,7 +227,7 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
     private int doWriteInternal(ChannelOutboundBuffer in, Object msg) throws Exception {
         if (msg instanceof ByteBuf) {
             ByteBuf buf = (ByteBuf) msg;
-            // 若可读字节数为0，则从缓存区中移除
+            // 若可读字节数为0, 则从缓存区中移除
             if (!buf.isReadable()) {
                 in.remove();
                 return 0;
@@ -239,7 +238,7 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
             if (localFlushedAmount > 0) {
                 in.progress(localFlushedAmount);
                 if (!buf.isReadable()) {
-                    // 若可读字节数为0，则从缓存区中移除
+                    // 若可读字节数为0, 则从缓存区中移除
                     in.remove();
                 }
                 return 1;
@@ -270,7 +269,7 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
 
     @Override
     protected void doWrite(ChannelOutboundBuffer in) throws Exception {
-        // 写请求自循环次数，默认为16次
+        // 写请求自循环次数, 默认为16次
         int writeSpinCount = config().getWriteSpinCount();
         do {
             // 获取当前 Channel 的缓存 ChannelOutboundBuffer 中的当前待刷新消息
@@ -279,7 +278,7 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
                 // 所有消息都发送成功了
 
                 clearOpWrite();
-                // 直接返回，没必要再添加写任务
+                // 直接返回, 没必要再添加写任务
                 return;
             }
             // 发送数据
@@ -288,7 +287,7 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
 
         // 当因缓冲区满了而发送失败时 doWriteInternal 返回 Integer.MAX_VALUE
         // 此时 writeSpinCount < 0 为 true
-        // 当发送16次还未发送完，但每次都写成功时，writeSpinCount 为 0
+        // 当发送16次还未发送完, 但每次都写成功时, writeSpinCount 为 0
         incompleteWrite(writeSpinCount < 0);
     }
 
@@ -319,7 +318,7 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
         } else {
             // 清除Channel选择Key兴趣事件集中的OP_WRITE写操作事件
             clearOpWrite();
-            // 将写操作任务添加到EventLoop线程上，以便后续继续发送
+            // 将写操作任务添加到EventLoop线程上, 以便后续继续发送
             eventLoop().execute(flushTask);
         }
     }

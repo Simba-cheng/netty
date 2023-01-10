@@ -331,7 +331,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
                 return true;
             }
             if (!taskQueue.offer(scheduledTask)) {
-                // 任务队列中没有剩余空间，说明普通任务队列满了添加失败，把定时任务放回 scheduletaskqueue 以便再次提取它，然后退出
+                // 任务队列中没有剩余空间, 说明普通任务队列满了添加失败, 把定时任务放回 scheduletaskqueue 以便再次提取它, 然后退出
                 scheduledTaskQueue.add((ScheduledFutureTask<?>) scheduledTask);
                 return false;
             }
@@ -883,7 +883,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
         boolean inEventLoop = inEventLoop();
         // 将任务添加到内部队列
         addTask(task);
-        // 如果不是 EventLoop 内部线程提交的task，则判断内部线程是否已经启动，没有则启动内部线程
+        // 如果不是 EventLoop 内部线程提交的task, 则判断内部线程是否已经启动, 没有则启动内部线程
         if (!inEventLoop) {
             // 启动内部线程
             startThread();
@@ -1002,7 +1002,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
     private void startThread() {
         // 确保 doStartThread 方法只会执行一次。
         if (state == ST_NOT_STARTED) {
-            // CAS操作，以非阻塞的线程安全方式更新
+            // CAS操作, 以非阻塞的线程安全方式更新
             if (STATE_UPDATER.compareAndSet(this, ST_NOT_STARTED, ST_STARTED)) {
                 boolean success = false;
                 try {
@@ -1037,12 +1037,12 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
     }
 
     /**
-     * doStartThread 方法看起来很长，其实就是向 NioEventLoop 内部的 ThreadPerTaskExecutor 提交一个线程(任务)，
-     * ThreadPerTaskExecutor 会创建一个新线程来执行这个任务，这个线程就是 NioEventLoop 内部的工作线程：
+     * doStartThread 方法看起来很长, 其实就是向 NioEventLoop 内部的 ThreadPerTaskExecutor 提交一个线程(任务), 
+     * ThreadPerTaskExecutor 会创建一个新线程来执行这个任务, 这个线程就是 NioEventLoop 内部的工作线程：
      */
     private void doStartThread() {
         assert thread == null;
-        // 对于 NioEventLoop，这个 executor 就是 ThreadPerTaskExecutor
+        // 对于 NioEventLoop, 这个 executor 就是 ThreadPerTaskExecutor
         executor.execute(new Runnable() { // remind <- 这个线程就是 NioEventLoop 内部的工作线程
             @Override
             public void run() {
@@ -1055,7 +1055,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
                 boolean success = false;
                 updateLastExecutionTime();
                 try {
-                    // MARK 执行 SingleThreadEventExecutor 的 run() 方法，它在 NioEventLoop 中实现了
+                    // MARK 执行 SingleThreadEventExecutor 的 run() 方法, 它在 NioEventLoop 中实现了
                     SingleThreadEventExecutor.this.run();
                     success = true;
                 } catch (Throwable t) {
