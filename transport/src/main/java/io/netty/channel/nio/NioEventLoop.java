@@ -217,6 +217,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
             }
         });
 
+        // 只针对 JDK NIO 原生 Selector 的实现类进行优化, 因为 SelectorProvider 可以加载的是自定义 Selector 实现的。
         if (!(maybeSelectorImplClass instanceof Class) ||
                 // ensure the current selector implementation is what we can instrument.
                 !((Class<?>) maybeSelectorImplClass).isAssignableFrom(unwrappedSelector.getClass())) {
