@@ -198,6 +198,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         }
 
         if (DISABLE_KEY_SET_OPTIMIZATION) {
+            // 直接返回 JDK NIO 原生 Selector
             return new SelectorTuple(unwrappedSelector);
         }
 
