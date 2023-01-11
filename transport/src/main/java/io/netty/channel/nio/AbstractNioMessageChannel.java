@@ -101,7 +101,7 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
                             break;
                         }
 
-                        // 递增已读取的消息数量
+                        // 统计在当前事件循环中已经创建连接的个数
                         allocHandle.incMessagesRead(localRead);
                         // 循环不超过16次
                     } while (continueReading(allocHandle));
@@ -114,7 +114,8 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
                 for (int i = 0; i < size; i++) {
                     readPending = false;
 
-                    // 通过 NioServerSocketChannel 的 pipeline 传播 ChannelRead 事件
+                    // 通过 NioServerSocketChannel 的 pipeline 传播 ChannelRead 事件,
+                    // 将 NioSocketChannel 注册到 childParent 中某个 NioEventLoop 上。
                     // {@link io.netty.bootstrap.ServerBootstrap.ServerBootstrapAcceptor#channelRead}
                     // 从 readBuf 中取出的是 NioSocketChannel
                     pipeline.fireChannelRead(readBuf.get(i));
