@@ -295,8 +295,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
         final ChannelFuture regFuture = initAndRegister();
 
         /*
-            此处的channel,对于 ServerBootstrap 来说,一般是 NioServerSocketChannel
-            channel具体类型,是由 serverBootstrap.channel 方法设置的。
+            此处的channel, 是 NioServerSocketChannel, 由 serverBootstrap.channel 方法设置的。
          */
         final Channel channel = regFuture.channel();
         if (regFuture.cause() != null) {
