@@ -284,11 +284,11 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     private ChannelFuture doBind(final SocketAddress localAddress) {
 
         /*
-            MARK 创建、初始化、注册 channel
+            创建、初始化、注册 channel
 
             1. 创建 serverSocketChannel
             2. 初始化
-            3. register: 将 serverSocketChannel 注册到 NioEventLoop 的 selector 上.
+            3. register: 将 serverSocketChannel 注册到 parentGroup 中某个 NioEventLoop 的 selector 上.
 
             这是一个异步的过程
          */
