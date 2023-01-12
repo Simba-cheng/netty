@@ -104,6 +104,9 @@ public class NioServerSocketChannel extends AbstractNioMessageChannel
     public NioServerSocketChannel(ServerSocketChannel channel) {
         // 在父类中完成了 非阻塞IO的配置,及事件的注册
         super(null, channel, SelectionKey.OP_ACCEPT);
+
+        // javaChannel() 方法返回的是 java.nio.channels.ServerSocketChannel,
+        // 也就是 {@link io.netty.channel.socket.nio.NioServerSocketChannel.newChannel} 才创建的。
         config = new NioServerSocketChannelConfig(this, javaChannel().socket());
     }
 
