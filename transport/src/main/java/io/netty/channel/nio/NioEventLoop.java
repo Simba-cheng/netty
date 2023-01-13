@@ -123,6 +123,8 @@ public final class NioEventLoop extends SingleThreadEventLoop {
 
     /**
      * 保存 java.nio.channels.SelectionKey 的集合
+     * <p>
+     * SelectedSelectionKeySet 是 netty 优化后的数据结构
      */
     private SelectedSelectionKeySet selectedKeys;
 
@@ -230,7 +232,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
 
         final Class<?> selectorImplClass = (Class<?>) maybeSelectorImplClass;
 
-        // SelectedSelectionKeySet 是 netty 优化后的 Set 类型
+        // SelectedSelectionKeySet 是 netty 优化后的数据结构
         final SelectedSelectionKeySet selectedKeySet = new SelectedSelectionKeySet();
 
         Object maybeException = AccessController.doPrivileged(new PrivilegedAction<Object>() {
