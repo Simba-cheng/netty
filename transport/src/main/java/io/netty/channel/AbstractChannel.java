@@ -555,8 +555,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
          */
         private void register0(ChannelPromise promise) {
             try {
-                // check if the channel is still open as it could be closed in the mean time when the register
-                // call was outside of the eventLoop
+                // 检查注册操作是否已经取消，或者对应 channel 是否已经关闭
                 if (!promise.setUncancellable() || !ensureOpen(promise)) {
                     return;
                 }
@@ -564,10 +563,11 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
 
                 // 调用 JDK 层面的 register() 方法进行注册
                 doRegister();
+                // 修改注册状态
                 neverRegistered = false;
                 registered = true;
 
-                // 触发 handlerAdded 事件
+                // 触发 handlerAdded 方法
                 // 回调 pipeline 中添加的 ChannelInitializer 的 handlerAdded 方法。
                 pipeline.invokeHandlerAddedIfNeeded();
 
@@ -583,6 +583,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                 // 注册时不活跃, 绑定端口后活跃
                 if (isActive()) {
                     if (firstRegistration) {
+                        // 触发 channelActive 事件
                         pipeline.fireChannelActive();
                     } else if (config().isAutoRead()) {
                         // This channel was registered before and autoRead() is set. This means we need to begin read
