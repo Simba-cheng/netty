@@ -190,15 +190,15 @@ public final class NioEventLoop extends SingleThreadEventLoop {
     private SelectorTuple openSelector() {
         final Selector unwrappedSelector;
 
-        // 创建 selector
+        // 创建 JDK NIO 原生 java.nio.channels.Selector
         try {
             unwrappedSelector = provider.openSelector();
         } catch (IOException e) {
             throw new ChannelException("failed to open a new selector", e);
         }
 
+        // 默认是会优化的，否则直接返回 JDK NIO 原生 java.nio.channels.Selector
         if (DISABLE_KEY_SET_OPTIMIZATION) {
-            // 直接返回 JDK NIO 原生 Selector
             return new SelectorTuple(unwrappedSelector);
         }
 
