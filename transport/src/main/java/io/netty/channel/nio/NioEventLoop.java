@@ -122,9 +122,9 @@ public final class NioEventLoop extends SingleThreadEventLoop {
     private Selector unwrappedSelector;
 
     /**
-     * 保存 java.nio.channels.SelectionKey 的集合
-     * <p>
-     * SelectedSelectionKeySet 是 netty 优化后的数据结构
+     * netty 优化后的数据结构
+     *
+     * 优化 JDK NIO 原生 java.nio.channels.Selector
      */
     private SelectedSelectionKeySet selectedKeys;
 
