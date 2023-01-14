@@ -190,6 +190,8 @@ public final class NioEventLoop extends SingleThreadEventLoop {
     }
 
     private SelectorTuple openSelector() {
+
+        // 被 Netty 优化过的 JDK NIO 原生 java.nio.channels.Selector
         final Selector unwrappedSelector;
 
         // 创建 JDK NIO 原生 java.nio.channels.Selector
