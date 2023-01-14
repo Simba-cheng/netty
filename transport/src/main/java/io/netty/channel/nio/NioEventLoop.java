@@ -123,7 +123,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
 
     /**
      * netty 优化后的数据结构
-     *
+     * <p>
      * 优化 JDK NIO 原生 java.nio.channels.Selector
      */
     private SelectedSelectionKeySet selectedKeys;
