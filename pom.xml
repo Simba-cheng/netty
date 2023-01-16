@@ -618,6 +618,7 @@
   </properties>
 
   <modules>
+    <module>nio-example</module>
     <module>netty-example</module>
     <module>all</module>
     <module>dev-tools</module>

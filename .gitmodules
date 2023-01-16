@@ -1,3 +1,6 @@
 [submodule "netty-example"]
 	path = netty-example
 	url = git@github.com:Simba-cheng/netty-example.git
+[submodule "nio-example"]
+	path = nio-example
+	url = git@github.com:Simba-cheng/nio-example.git
