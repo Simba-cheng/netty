@@ -555,7 +555,6 @@ public final class NioEventLoop extends SingleThreadEventLoop {
 
                         case SelectStrategy.BUSY_WAIT: // -3
                             // NioEventLoop不支持, 用于 EpollEventLoop, 理论上不会走到这里
-                            // fall-through to SELECT since the busy-wait is not supported with NIO
 
                         case SelectStrategy.SELECT: // -1
                             // remind 任务队列为空的时候, 会执行本逻辑
@@ -587,6 +586,8 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                     handleLoopException(e);
                     continue;
                 }
+
+                // MARK 执行到这里说明满足了唤醒条件，EventLoop 线程从 Selector 上被唤醒开始处理 IO就绪事件 和 执行异步任务。
 
                 // 轮训次数++, 用来解决jdk空轮训bug
                 selectCnt++;
