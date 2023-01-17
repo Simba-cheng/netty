@@ -535,8 +535,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         // 死循环
         for (; ; ) {
             try {
-                // selectStrategy 用于控制工作线程的 select 策略, 在存在异步任务的场景,
-                // NioEventLoop 会优先保证 CPU 能够及时处理异步任务；
+                // selectStrategy 用于控制工作线程的select策略，在存在异步任务的场景，会优先执行IO就绪事件，在执行异步任务。
                 int strategy;
                 try {
                     /*
