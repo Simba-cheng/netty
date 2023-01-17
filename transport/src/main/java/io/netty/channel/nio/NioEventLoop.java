@@ -542,10 +542,12 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                        确定 select 处理策略, 用于控制 select 循环行为, 包含 CONTINUE、SELECT、BUSY_WAIT 三种策略,
                        Netty 不支持 BUSY_WAIT。
 
+                       这里的 hasTasks() 主要检查的是 普通队列 和 尾部队列 中是否有异步任务等待执行。
+
                        当前有任务时, 那么执行 selectNowSupplier 代表的方法, 也就是 selector.selectNow()
                        当前无任务时, 那么返回 SelectStrategy.SELECT,也就是-1
 
-                       根据轮询策略获取轮询结果, 这里的 hasTasks() 主要检查的是 普通队列 和 尾部队列 中是否有异步任务等待执行。
+                       根据轮询策略获取轮询结果,
                      */
                     strategy = selectStrategy.calculateStrategy(selectNowSupplier, hasTasks());
                     switch (strategy) {
