@@ -556,18 +556,22 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                             // NioEventLoop不支持, 用于 EpollEventLoop, 理论上不会走到这里
 
                         case SelectStrategy.SELECT: // -1
-                            // remind 任务队列为空的时候, 会执行本逻辑
+                            // remind 当前没有异步任务执行，可以放心的阻塞等待IO就绪事件
 
-                            // 下一次定时任务触发截止时间
+                            // 从定时任务队列中取出, 即将快要执行的定时任务的 deadline(下一次定时任务触发截止时间)。
                             long curDeadlineNanos = nextScheduledTaskDeadlineNanos();
                             if (curDeadlineNanos == -1L) {
+                                // -1 代表当前定时任务队列中没有定时任务
                                 curDeadlineNanos = NONE; // nothing on the calendar
                             }
+
+                            // 最早执行定时任务的 deadline(下一次定时任务触发截止时间) 作为 select 的阻塞时间,
+                            // 意思是到了定时任务的执行时间, 不管有无 I/O就绪事件, 必须唤醒 selector, 从而使线程执行定时任务
                             nextWakeupNanos.set(curDeadlineNanos);
                             try {
                                 // 再次判断是否有任务
                                 if (!hasTasks()) {
-                                    // MARK 轮询 I/O 事件(轮训就绪的 channel)
+                                    // 没有任务, select 阻塞轮询 I/O 就绪事件
                                     strategy = select(curDeadlineNanos);
                                 }
                             } finally {
