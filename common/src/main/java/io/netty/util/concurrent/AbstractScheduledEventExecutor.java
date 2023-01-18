@@ -180,6 +180,7 @@ public abstract class AbstractScheduledEventExecutor extends AbstractEventExecut
      */
     protected final long nextScheduledTaskDeadlineNanos() {
         ScheduledFutureTask<?> scheduledTask = peekScheduledTask();
+        // -1 代表当前定时任务队列中没有定时任务
         return scheduledTask != null ? scheduledTask.deadlineNanos() : -1;
     }
 
