@@ -878,6 +878,11 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
         execute(ObjectUtil.checkNotNull(task, "task"), false);
     }
 
+    /**
+     * @param task task
+     * @param immediate 提交的任务是否需要被立即执行。
+     *                  在 Netty 中只要提交的任务不是 LazyRunnable 类型，都是需要立即执行的，即：immediate = true。
+     */
     private void execute(Runnable task, boolean immediate) {
         // 判断当前执行线程是否为EventLoop内部的工作线程
         boolean inEventLoop = inEventLoop();
